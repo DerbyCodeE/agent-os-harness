@@ -1,0 +1,29 @@
+{
+  "prompt": "Real NotebookLM demo — Side-by-side comparison of two NotebookLM-generated video overviews from the same OpenClaw notebook: 'Power and Peril' (Apr 2026) vs 'Your AI, Your Risk?' (Mar 2026). Shows how the same source notebook produced two different framings. Both sources downloaded from NLM via mcp__notebooklm-mcp.",
+  "createdAt": 1779900000011,
+  "source": "agent-os/video/nlm-real",
+  "demo": true,
+  "demoCategory": "notebooklm-edit",
+  "title": "Real NLM artifacts · side-by-side comparison (60s)",
+  "description": "Two NotebookLM video overviews from the same notebook, edited side-by-side with HyperFrames.",
+  "estimatedDuration": 60,
+  "sourceArtifacts": [
+    {
+      "type": "notebooklm-video-overview",
+      "notebook": "OpenClaw",
+      "artifactTitle": "OpenClaw: Power and Peril",
+      "createdAt": "2026-04-15T01:31:33Z"
+    },
+    {
+      "type": "notebooklm-video-overview",
+      "notebook": "OpenClaw",
+      "artifactTitle": "OpenClaw: Your AI, Your Risk?",
+      "createdAt": "2026-03-01T02:36:11Z"
+    }
+  ],
+  "scenes": [
+    { "name": "Intro card — comparing two NLM takes", "duration": 5 },
+    { "name": "Side-by-side panels + captions", "duration": 50 },
+    { "name": "Outro CTA", "duration": 5 }
+  ]
+}

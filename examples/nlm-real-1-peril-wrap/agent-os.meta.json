@@ -1,0 +1,23 @@
+{
+  "prompt": "Real NotebookLM demo — Brand wrap of the actual NotebookLM-generated video overview 'OpenClaw: Power and Peril'. Source is a real NLM artifact downloaded via mcp__notebooklm-mcp__download_artifact from the OpenClaw notebook. Wraps it in Agent OS branding: intro card, brand bars, chapter callouts referencing NLM's 5 chapters, outro CTA.",
+  "createdAt": 1779900000010,
+  "source": "agent-os/video/nlm-real",
+  "demo": true,
+  "demoCategory": "notebooklm-edit",
+  "title": "Real NLM artifact · Power and Peril · branded wrap (70s)",
+  "description": "Edit a real NotebookLM-generated video overview with HyperFrames.",
+  "estimatedDuration": 70,
+  "sourceArtifact": {
+    "type": "notebooklm-video-overview",
+    "notebook": "OpenClaw",
+    "notebookId": "a39fba87-c9d3-4c0a-bfd2-3efa028c9617",
+    "artifactId": "27d85c2d-07fe-476a-bec7-706f75df7719",
+    "artifactTitle": "OpenClaw: Power and Peril",
+    "createdAt": "2026-04-15T01:31:33Z"
+  },
+  "scenes": [
+    { "name": "Agent OS intro card", "duration": 5 },
+    { "name": "NLM video + brand bars + chapter callouts", "duration": 60 },
+    { "name": "Outro CTA", "duration": 5 }
+  ]
+}

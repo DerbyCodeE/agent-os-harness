@@ -1,0 +1,20 @@
+{
+  "prompt": "Showcase #2 — Split-screen feature reel. Avatar on left side talks, animated feature highlights cycle on right side with beat-synced motion. Color-cycling backgrounds, bouncy caption animations, icon morphs, scrolling feature pills.",
+  "createdAt": 1779800000001,
+  "source": "agent-os/video/showcase",
+  "showcase": true,
+  "showcaseId": 2,
+  "title": "Feature reel · 90s split-screen showcase",
+  "description": "Avatar on left, animated highlight cards cycling on right. Pink + gold + emerald + plum color cycle.",
+  "estimatedDuration": 90,
+  "scenes": [
+    { "name": "Intro flash + title sweep", "duration": 6 },
+    { "name": "Split-screen open with avatar", "duration": 4 },
+    { "name": "Feature 1: One dashboard", "duration": 15 },
+    { "name": "Feature 2: Free Claude Code", "duration": 15 },
+    { "name": "Feature 3: Hermes Goal Mode", "duration": 15 },
+    { "name": "Feature 4: Studio + X-Search", "duration": 15 },
+    { "name": "Stat burst", "duration": 12 },
+    { "name": "CTA close", "duration": 8 }
+  ]
+}

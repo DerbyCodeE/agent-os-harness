@@ -1,0 +1,27 @@
+{
+  "_help": "Copy this file to ~/.agentic-os/config.json (or to agentic-os.config.json in the project root) and edit the paths to match your machine. Anything you leave out auto-detects or falls back to sensible defaults.",
+
+  "claude": null,
+  "openclaw": null,
+  "hermes": null,
+  "_paths_note": "Leave as null to auto-detect via `which`. Or paste the full path you get from `which claude` etc.",
+
+  "vaultRoot": null,
+  "_vault_note": "Full path to your Obsidian vault. Leave null and we'll try ~/Documents/Obsidian Vault, ~/Obsidian, ~/Obsidian Vault.",
+
+  "openclawAgent": "main",
+  "_agent_note": "Which openclaw agent to chat with by default (main, julian, marketing, etc.). Run `openclaw agents list` to see yours.",
+
+  "goalCategories": ["Health", "Personal", "Work", "Learning", "Side Project"],
+
+  "seoSites": null,
+  "_seo_note": "The SEO generator writes blog posts into these site repos. Leave null to use the built-in default funnel, or list your own. Each entry: { id, name, url, path }. `path` is the repo root (absolute or ~/...); postsDir defaults to <path>/src/blog/posts (override with an optional `postsDir`). Example: [{ \"id\": \"mysite\", \"name\": \"mysite.com\", \"url\": \"https://mysite.com\", \"path\": \"~/mysite\" }]",
+  "seoSkillSite": null,
+  "_seo_skill_note": "Which site (by id) holds .claude/skills/blog-post.md and .claude/transcripts. Defaults to the first site in seoSites.",
+
+  "nlmBin": null,
+  "_nlm_note": "Path to the notebooklm-mcp binary. Leave null to auto-detect on PATH / common install locations. (Or set env AGENTIC_OS_NLM_MCP_BIN.)",
+
+  "locationLabel": "Local",
+  "_location_note": "Shown in the top-bar timestamp. e.g. \"Bangkok\", \"London\", or just \"Local\"."
+}

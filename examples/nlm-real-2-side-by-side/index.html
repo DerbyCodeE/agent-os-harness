@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Agent OS · Real NLM Side-by-Side</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<style>
+  :root {
+    --bg-deep: #15101a; --cream: #f3ebda; --cream-dim: #a59783;
+    --gold: #d4a574; --pink: #f472b6; --emerald: #5ab896;
+    --blue: #60a5fa; --plum: #c4607e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; overflow: hidden; font-family: 'Inter', -apple-system, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  #stage {
+    position: relative;
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: #0a070d;
+  }
+
+  /* Two video panels side by side */
+  .panel {
+    position: absolute;
+    top: 110px;
+    width: 900px;
+    height: 700px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--bg-deep);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+  }
+  .panel video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .panel-left {
+    left: 50px;
+    border: 3px solid var(--blue);
+    box-shadow: 0 0 60px rgba(96,165,250,0.25), 0 30px 80px rgba(0,0,0,0.7);
+  }
+  .panel-right {
+    right: 50px;
+    border: 3px solid var(--pink);
+    box-shadow: 0 0 60px rgba(244,114,182,0.25), 0 30px 80px rgba(0,0,0,0.7);
+  }
+
+  /* Panel labels — above each video */
+  .panel-label {
+    position: absolute;
+    top: 50px;
+    width: 900px;
+    z-index: 25;
+    opacity: 0;
+  }
+  .label-left { left: 50px; }
+  .label-right { right: 50px; }
+  .panel-label .num {
+    display: inline-block;
+    font-size: 14px;
+    color: var(--cream-dim);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .panel-label .title {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .label-left .num { color: var(--blue); }
+  .label-right .num { color: var(--pink); }
+
+  /* Center column — VS badge + dates */
+  .vs-column {
+    position: absolute;
+    top: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 700px;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+  .vs-badge {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--pink));
+    display: grid; place-items: center;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--bg-deep);
+    letter-spacing: -0.02em;
+    box-shadow: 0 0 40px rgba(244,114,182,0.4), 0 0 40px rgba(96,165,250,0.3);
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  .date-pill {
+    padding: 8px 16px;
+    background: rgba(21,16,26,0.92);
+    border: 1px solid var(--gold);
+    border-radius: 999px;
+    font-size: 16px;
+    color: var(--cream);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    opacity: 0;
+  }
+
+  /* Bottom caption — describing what's being compared */
+  .compare-cap {
+    position: absolute;
+    bottom: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    padding: 24px 48px;
+    background: rgba(21,16,26,0.95);
+    border-radius: 16px;
+    border: 1px solid var(--gold);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    opacity: 0;
+    max-width: 1200px;
+  }
+  .compare-cap .eyebrow {
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .compare-cap .text {
+    font-size: 30px;
+    color: var(--cream);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .compare-cap .text em {
+    font-style: normal;
+    color: var(--gold);
+  }
+
+  /* TOP BRAND BAR */
+  .brand-bar-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 80px;
+    z-index: 35;
+    background: linear-gradient(180deg, rgba(21,16,26,0.98), rgba(21,16,26,0.9));
+    border-bottom: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    padding: 0 50px;
+    transform: translateY(-100%);
+  }
+  .brand-bar-top .logo {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+  }
+  .brand-bar-top .logo em {
+    font-style: normal;
+    color: var(--gold);
+  }
+  .brand-bar-top .spacer { flex: 1; }
+  .brand-bar-top .src-tag {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 16px;
+    color: var(--cream-dim);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .brand-bar-top .src-tag strong { color: var(--blue); font-weight: 700; }
+
+  /* BOTTOM BRAND BAR */
+  .brand-bar-bot {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 90px;
+    z-index: 35;
+    background: linear-gradient(0deg, rgba(21,16,26,0.98), rgba(21,16,26,0.85));
+    border-top: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    padding: 0 50px;
+    transform: translateY(100%);
+  }
+  .brand-bar-bot .url {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+  }
+  .brand-bar-bot .url em {
+    font-style: normal;
+    color: var(--gold);
+  }
+  .brand-bar-bot .spacer { flex: 1; }
+  .brand-bar-bot .channel {
+    font-size: 18px;
+    color: var(--cream-dim);
+  }
+  .brand-bar-bot .channel strong {
+    color: var(--cream);
+    font-weight: 700;
+  }
+
+  /* INTRO */
+  .intro-card {
+    position: absolute; inset: 0; z-index: 60;
+    background: radial-gradient(ellipse 70% 50% at 50% 40%, rgba(96,165,250,0.15), transparent),
+                linear-gradient(135deg, #15101a, #0a070d);
+    display: grid; place-items: center;
+  }
+  .intro-card .stack { text-align: center; padding: 0 80px; }
+  .intro-card .nlm-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(96,165,250,0.12);
+    border: 1px solid var(--blue);
+    border-radius: 999px;
+    margin-bottom: 30px;
+    opacity: 0;
+  }
+  .intro-card .nlm-pill .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--blue);
+    margin-right: 12px;
+    box-shadow: 0 0 12px var(--blue);
+  }
+  .intro-card .nlm-pill .label {
+    font-size: 18px;
+    color: var(--blue);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .intro-card h1 {
+    font-size: 120px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    background: linear-gradient(180deg, #f3ebda, #d4a574);
+    -webkit-background-clip: text; color: transparent;
+    margin-bottom: 24px;
+  }
+  .intro-card h1 em {
+    font-style: normal;
+    background: linear-gradient(180deg, var(--blue), var(--pink));
+    -webkit-background-clip: text; color: transparent;
+  }
+  .intro-card .sub {
+    font-size: 32px;
+    color: var(--cream-dim);
+    opacity: 0;
+  }
+
+  /* OUTRO */
+  .outro-card {
+    position: absolute; inset: 0; z-index: 60;
+    background: linear-gradient(135deg, #15101a, #0a070d);
+    display: grid; place-items: center;
+    opacity: 0;
+  }
+  .outro-card .stack { text-align: center; padding: 0 80px; }
+  .outro-card .eyebrow {
+    font-size: 22px;
+    color: var(--gold);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-weight: 700;
+  }
+  .outro-card h2 {
+    font-size: 100px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    background: linear-gradient(180deg, #f3ebda, #d4a574);
+    -webkit-background-clip: text; color: transparent;
+    margin-bottom: 32px;
+  }
+  .outro-card .url {
+    font-size: 28px;
+    color: var(--gold);
+    letter-spacing: 0.18em;
+    margin-top: 20px;
+  }
+
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, rgba(96,165,250,0.5), transparent),
+      radial-gradient(2px 2px at 80% 70%, rgba(244,114,182,0.4), transparent),
+      radial-gradient(1px 1px at 50% 50%, rgba(243,235,218,0.5), transparent);
+    background-size: 800px 800px, 600px 600px, 400px 400px;
+  }
+</style>
+</head>
+<body>
+<div id="stage" data-composition-id="agent-os-nlm-side-by-side" data-duration="60" data-width="1920" data-height="1080">
+
+  <!-- Two real NLM video overviews side-by-side, 5s to 55s -->
+  <div class="panel panel-left" id="panel-left">
+    <video id="vid-left" src="assets/risk-50s.mp4"
+           data-start="5" data-duration="50" data-track-index="0"
+           muted playsinline preload="auto"></video>
+  </div>
+
+  <div class="panel panel-right" id="panel-right">
+    <video id="vid-right" src="assets/peril-50s.mp4"
+           data-start="5" data-duration="50" data-track-index="1"
+           muted playsinline preload="auto"></video>
+  </div>
+
+  <!-- Panel labels -->
+  <div class="panel-label label-left" id="label-left">
+    <div class="num">NLM Take 01 · Mar 2026</div>
+    <div class="title">OpenClaw: Your AI, Your Risk?</div>
+  </div>
+  <div class="panel-label label-right" id="label-right">
+    <div class="num">NLM Take 02 · Apr 2026</div>
+    <div class="title">OpenClaw: Power and Peril</div>
+  </div>
+
+  <!-- VS column -->
+  <div class="vs-column">
+    <div class="date-pill" id="date-1">Mar 1</div>
+    <div class="vs-badge" id="vs-badge">VS</div>
+    <div class="date-pill" id="date-2">Apr 15</div>
+  </div>
+
+  <!-- Bottom rotating caption -->
+  <div class="compare-cap" id="cap-1">
+    <div class="eyebrow">Same Notebook · Two Takes</div>
+    <div class="text">NotebookLM regenerated this video <em>6 weeks apart</em></div>
+  </div>
+  <div class="compare-cap" id="cap-2" style="display:none">
+    <div class="eyebrow">Compare The Framing</div>
+    <div class="text">First take leads with <em>privacy</em> · second leads with <em>danger</em></div>
+  </div>
+  <div class="compare-cap" id="cap-3" style="display:none">
+    <div class="eyebrow">Same Source · Same Notebook</div>
+    <div class="text">Different <em>narrative arcs</em> · same source material</div>
+  </div>
+  <div class="compare-cap" id="cap-4" style="display:none">
+    <div class="eyebrow">Why This Matters</div>
+    <div class="text">Re-generate any NLM video anytime · <em>edit it inside Agent OS</em></div>
+  </div>
+
+  <!-- TOP BRAND BAR -->
+  <div class="brand-bar-top" id="bar-top">
+    <div class="logo">AGENT <em>OS</em></div>
+    <div class="spacer"></div>
+    <div class="src-tag">Both sources · <strong>NotebookLM</strong></div>
+  </div>
+
+  <!-- BOTTOM BRAND BAR -->
+  <div class="brand-bar-bot" id="bar-bot">
+    <div class="url">agentos<em>.guide</em></div>
+    <div class="spacer"></div>
+    <div class="channel"><strong>Julian Goldie</strong> · AI Profit Boardroom</div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="intro-card" id="intro-card">
+    <div class="stars"></div>
+    <div class="stack">
+      <div class="nlm-pill" id="intro-pill">
+        <div class="dot"></div>
+        <div class="label">2 Real NotebookLM Artifacts</div>
+      </div>
+      <h1 id="intro-h1">Same notebook<br><em>different takes</em></h1>
+      <div class="sub" id="intro-sub">Comparing two NLM video overviews from the OpenClaw notebook</div>
+    </div>
+  </div>
+
+  <!-- OUTRO -->
+  <div class="outro-card" id="outro-card">
+    <div class="stars"></div>
+    <div class="stack">
+      <div class="eyebrow">Edit any NLM artifact</div>
+      <h2>NotebookLM → Agent OS</h2>
+      <div class="url">agentos.guide</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  window.__timelines = window.__timelines || {};
+
+  gsap.set("#bar-top", { y: -100 });
+  gsap.set("#bar-bot", { y: 100 });
+  gsap.set("#panel-left", { opacity: 0, x: -80 });
+  gsap.set("#panel-right", { opacity: 0, x: 80 });
+  gsap.set("#label-left", { opacity: 0, y: -20 });
+  gsap.set("#label-right", { opacity: 0, y: -20 });
+  gsap.set("#vs-badge", { opacity: 0, scale: 0.6 });
+  gsap.set(".date-pill", { opacity: 0 });
+  gsap.set(".compare-cap", { opacity: 0, y: 30 });
+  gsap.set("#outro-card", { opacity: 0 });
+  gsap.set("#intro-h1", { opacity: 0, scale: 0.9, y: 30 });
+
+  const tl = gsap.timeline({ paused: true });
+
+  // 0-5s: INTRO
+  tl.to("#intro-pill", { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.3)
+    .to("#intro-h1", { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: "back.out(1.4)" }, 0.6)
+    .to("#intro-sub", { opacity: 1, duration: 0.5, ease: "power2.out" }, 1.7)
+    .to("#intro-card", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 4.5);
+
+  // 5s: Brand bars + panels slide in
+  tl.to("#bar-top", { y: 0, duration: 0.5, ease: "power3.out" }, 5)
+    .to("#bar-bot", { y: 0, duration: 0.5, ease: "power3.out" }, 5.1)
+    .to("#panel-left", { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 5.3)
+    .to("#panel-right", { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 5.4);
+
+  // 6s: Labels + VS column
+  tl.to("#label-left", { opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.4)" }, 6)
+    .to("#label-right", { opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.4)" }, 6.1)
+    .to("#vs-badge", { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, 6.3)
+    .to("#date-1", { opacity: 1, duration: 0.3 }, 6.5)
+    .to("#date-2", { opacity: 1, duration: 0.3 }, 6.6);
+
+  // Bottom captions rotate every ~12s
+  tl.to("#cap-1", { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.4)" }, 8)
+    .to("#cap-1", { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 19);
+  tl.set("#cap-1", { display: "none" }, 19.5);
+  tl.set("#cap-2", { display: "block" }, 19.6)
+    .to("#cap-2", { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.4)" }, 20)
+    .to("#cap-2", { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 31);
+  tl.set("#cap-2", { display: "none" }, 31.5);
+  tl.set("#cap-3", { display: "block" }, 31.6)
+    .to("#cap-3", { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.4)" }, 32)
+    .to("#cap-3", { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 43);
+  tl.set("#cap-3", { display: "none" }, 43.5);
+  tl.set("#cap-4", { display: "block" }, 43.6)
+    .to("#cap-4", { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.4)" }, 44)
+    .to("#cap-4", { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 54);
+
+  // 55s: Brand bars + panels slide out, outro fades in
+  tl.to("#bar-top", { y: -100, duration: 0.4, ease: "power3.in" }, 54.6)
+    .to("#bar-bot", { y: 100, duration: 0.4, ease: "power3.in" }, 54.6)
+    .to("#panel-left", { opacity: 0, x: -80, duration: 0.5, ease: "power3.in" }, 54.5)
+    .to("#panel-right", { opacity: 0, x: 80, duration: 0.5, ease: "power3.in" }, 54.5)
+    .to("#outro-card", { opacity: 1, duration: 0.6, ease: "power2.out" }, 55);
+
+  window.__timelines["agent-os-nlm-side-by-side"] = tl;
+</script>
+</body>
+</html>

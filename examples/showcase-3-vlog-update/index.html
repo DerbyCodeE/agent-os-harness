@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Agent OS · Vlog Update</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<style>
+  :root {
+    --bg-deep: #15101a; --cream: #f3ebda; --cream-dim: #a59783;
+    --gold: #d4a574; --pink: #f472b6; --emerald: #5ab896;
+    --blue: #60a5fa; --plum: #c4607e; --rust: #c97c5e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; overflow: hidden; font-family: 'Inter', -apple-system, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  #stage {
+    position: relative;
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: #0a070d;
+  }
+
+  /* Full-bleed avatar with subtle blur backdrop */
+  .bg-avatar {
+    position: absolute; inset: 0; z-index: 0;
+    overflow: hidden;
+  }
+  .bg-avatar video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: blur(40px) brightness(0.4);
+    transform: scale(1.2);
+  }
+  .bg-tint {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      radial-gradient(ellipse 80% 70% at 50% 50%, transparent, rgba(0,0,0,0.5)),
+      linear-gradient(180deg, rgba(21,16,26,0.4), rgba(21,16,26,0.7));
+  }
+
+  /* Main avatar — center-stage, cropped + framed */
+  .avatar-main {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 720px;
+    height: 720px;
+    z-index: 5;
+    /* opacity controlled by GSAP — see gsap.set below. Defaulting to 1 here
+       because .from(opacity:0) reads the CSS value as the END state and would
+       animate 0→0 = invisible forever. */
+  }
+  .avatar-frame { position: relative; }
+  .avatar-frame {
+    width: 100%; height: 100%;
+    border-radius: 40px;
+    overflow: hidden;
+    background: var(--bg-deep);
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 100px rgba(212,165,116,0.45), 0 40px 100px rgba(0,0,0,0.8);
+    position: relative;
+  }
+  .avatar-frame video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  /* CHANNEL INTRO (0-5s) — bouncy "AGENT OS WEEKLY" title */
+  .channel-intro {
+    position: absolute; inset: 0; z-index: 50;
+    display: grid; place-items: center;
+    background: #15101a;
+  }
+  .channel-intro .lockup {
+    text-align: center;
+  }
+  .channel-intro .eyebrow {
+    font-size: 32px;
+    color: var(--pink);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0;
+  }
+  .channel-intro h1 {
+    font-size: 200px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    background: linear-gradient(180deg, #f3ebda, #d4a574);
+    -webkit-background-clip: text; color: transparent;
+    margin-bottom: 12px;
+  }
+  .channel-intro h1 .w {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(80px);
+  }
+  .channel-intro .ep {
+    font-size: 40px;
+    color: var(--gold);
+    font-weight: 600;
+    opacity: 0;
+  }
+
+  /* TOP BRAND BAR */
+  .brand-bar-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(90deg, rgba(244,114,182,0.2), rgba(212,165,116,0.15), rgba(96,165,250,0.2));
+    border-bottom: 2px solid var(--gold);
+    z-index: 20;
+    display: flex; align-items: center;
+    padding: 0 60px;
+    transform: translateY(-100%);
+  }
+  .brand-bar-top .logo {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+  }
+  .brand-bar-top .logo em {
+    font-style: normal;
+    color: var(--gold);
+  }
+  .brand-bar-top .meta {
+    margin-left: auto;
+    color: var(--cream-dim);
+    font-size: 18px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .brand-bar-top .live {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-left: 24px;
+    padding: 6px 16px;
+    background: var(--pink);
+    color: #1a0f20;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.1em;
+  }
+  .brand-bar-top .live .d {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #1a0f20;
+  }
+
+  /* BOTTOM BRAND BAR */
+  .brand-bar-bottom {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: linear-gradient(90deg, rgba(21,16,26,0.85), rgba(21,16,26,0.95));
+    border-top: 2px solid var(--gold);
+    z-index: 20;
+    display: flex; align-items: center; justify-content: center;
+    gap: 48px;
+    transform: translateY(100%);
+  }
+  .brand-bar-bottom .tag {
+    color: var(--cream-dim);
+    font-size: 18px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .brand-bar-bottom .tag em {
+    font-style: normal;
+    color: var(--gold);
+    margin-right: 8px;
+  }
+
+  /* LOWER THIRDS — appear during topic segments */
+  .lower-third {
+    position: absolute;
+    bottom: 140px;
+    left: 60px;
+    z-index: 30;
+    max-width: 720px;
+    padding: 28px 40px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.92), rgba(21,16,26,0.85));
+    border-left: 8px solid var(--gold);
+    border-radius: 0 24px 24px 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  .lower-third .topic-num {
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .lower-third h2 {
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .lower-third h2 em {
+    font-style: normal;
+    color: var(--gold);
+  }
+
+  /* CALLOUT CARDS — right-side info boxes */
+  .callout {
+    position: absolute;
+    top: 200px;
+    right: 60px;
+    z-index: 30;
+    width: 420px;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, rgba(244,114,182,0.18), rgba(0,0,0,0.6));
+    border: 2px solid var(--pink);
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(244,114,182,0.3);
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  .callout .head {
+    font-size: 16px;
+    color: var(--pink);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .callout .body {
+    font-size: 26px;
+    color: var(--cream);
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+  .callout .body strong {
+    color: var(--gold);
+  }
+  .callout .meta {
+    font-size: 14px;
+    color: var(--cream-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* ARROW from callout to avatar */
+  .arrow {
+    position: absolute;
+    top: 360px;
+    right: 480px;
+    width: 220px;
+    z-index: 25;
+    opacity: 0;
+  }
+
+  /* LIKE & SUBSCRIBE BURST */
+  .subscribe-burst {
+    position: absolute; inset: 0; z-index: 60;
+    display: grid; place-items: center;
+    background: radial-gradient(ellipse at center, rgba(244,114,182,0.25), transparent 70%);
+    opacity: 0;
+  }
+  .subscribe-burst .like {
+    font-size: 200px;
+    margin-bottom: 32px;
+    transform: scale(0);
+  }
+  .subscribe-burst .text {
+    font-size: 120px;
+    font-weight: 800;
+    background: linear-gradient(180deg, #f3ebda, #f472b6);
+    -webkit-background-clip: text; color: transparent;
+    letter-spacing: -0.04em;
+    text-align: center;
+    opacity: 0;
+  }
+  .subscribe-burst .sub {
+    font-size: 40px;
+    color: var(--cream-dim);
+    margin-top: 20px;
+    text-align: center;
+    opacity: 0;
+  }
+
+  /* OUTRO */
+  .outro {
+    position: absolute; inset: 0; z-index: 70;
+    display: grid; place-items: center;
+    background: linear-gradient(180deg, #15101a, #0a070d);
+    opacity: 0;
+  }
+  .outro .logo {
+    font-size: 180px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    background: linear-gradient(180deg, #f3ebda, #d4a574);
+    -webkit-background-clip: text; color: transparent;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .outro .tagline {
+    font-size: 36px;
+    color: var(--gold);
+    text-align: center;
+    letter-spacing: 0.1em;
+    margin-bottom: 40px;
+  }
+  .outro .url {
+    padding: 24px 60px;
+    border: 2px solid var(--gold);
+    border-radius: 999px;
+    color: var(--cream);
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  /* Sparkles */
+  .sparkle {
+    position: absolute;
+    z-index: 35;
+    font-size: 32px;
+    pointer-events: none;
+    opacity: 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="stage" data-composition-id="agent-os-vlog" data-start="0" data-width="1920" data-height="1080" data-duration="90" data-fps="30">
+
+  <!-- Background tint only (dropped bg-blur video — duplicate src/start caused lint warn) -->
+  <div class="bg-tint" style="background: linear-gradient(180deg, #15101a, #0a070d);"></div>
+
+  <!-- Main avatar — single pre-looped clip (82.819s, source × 6 concat via ffmpeg).
+       Single <video> tag avoids the white-bar artifact from inactive chained clips. -->
+  <div class="avatar-main" id="avatar-main">
+    <div class="avatar-frame">
+      <video id="avatar-video" src="assets/avatar-looped.mp4"
+             data-start="5" data-duration="73" data-track-index="0"
+             muted playsinline preload="auto"
+             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
+    </div>
+  </div>
+
+  <!-- TOP brand bar -->
+  <div class="brand-bar-top" id="bar-top">
+    <div class="logo">AGENT <em>OS</em></div>
+    <div class="meta">WEEKLY UPDATE</div>
+    <div class="live"><span class="d"></span>NEW</div>
+  </div>
+
+  <!-- BOTTOM brand bar -->
+  <div class="brand-bar-bottom" id="bar-bottom">
+    <div class="tag"><em>★</em>3,000+ members</div>
+    <div class="tag"><em>★</em>aiprofitboardroom.com</div>
+    <div class="tag"><em>★</em>Daily live calls</div>
+  </div>
+
+  <!-- TOPIC 1 lower third + callout (10-28s) -->
+  <div class="lower-third" id="lt-1">
+    <div class="topic-num">TOPIC 01</div>
+    <h2>Hermes <em>Goal Mode</em><br>just shipped</h2>
+  </div>
+  <div class="callout" id="co-1">
+    <div class="head">⚡ This week</div>
+    <div class="body">Set <strong>long-horizon goals</strong>. Walk away. Hermes runs autonomously until done.</div>
+    <div class="meta">/hermes/goals · live now</div>
+  </div>
+
+  <!-- TOPIC 2 lower third + callout (28-46s) -->
+  <div class="lower-third" id="lt-2" style="border-left-color: var(--emerald);">
+    <div class="topic-num" style="color: var(--emerald);">TOPIC 02</div>
+    <h2>Studio <em style="color: var(--emerald);">+ X-Search</em><br>now live</h2>
+  </div>
+  <div class="callout" id="co-2" style="border-color: var(--emerald); background: linear-gradient(135deg, rgba(90,184,150,0.18), rgba(0,0,0,0.6)); box-shadow: 0 0 40px rgba(90,184,150,0.3);">
+    <div class="head" style="color: var(--emerald);">🦞 OpenClaw Studio</div>
+    <div class="body"><strong>Grok 4.3</strong> renders images, video, voice + live-searches X. All inside your dashboard.</div>
+    <div class="meta">/openclaw/studio</div>
+  </div>
+
+  <!-- TOPIC 3 lower third + callout (46-64s) -->
+  <div class="lower-third" id="lt-3" style="border-left-color: var(--blue);">
+    <div class="topic-num" style="color: var(--blue);">TOPIC 03</div>
+    <h2>Talk to Grok <em style="color: var(--blue);">live</em></h2>
+  </div>
+  <div class="callout" id="co-3" style="border-color: var(--blue); background: linear-gradient(135deg, rgba(96,165,250,0.18), rgba(0,0,0,0.6)); box-shadow: 0 0 40px rgba(96,165,250,0.3);">
+    <div class="head" style="color: var(--blue);">🎙️ Real-time voice</div>
+    <div class="body"><strong>Phone-call</strong> style conversation with Grok 4.3. Auto turn-taking. No buttons.</div>
+    <div class="meta">/openclaw/studio/talk</div>
+  </div>
+
+  <!-- LIKE & SUBSCRIBE (64-80s) -->
+  <div class="subscribe-burst" id="sub-burst">
+    <div>
+      <div class="like" id="sub-like">👍</div>
+      <div class="text" id="sub-text">LIKE &<br>SUBSCRIBE</div>
+      <div class="sub" id="sub-sub">Hit the bell — daily Agent OS updates 🔔</div>
+    </div>
+  </div>
+
+  <!-- CHANNEL INTRO (0-5s) -->
+  <div class="channel-intro" id="intro">
+    <div class="lockup">
+      <div class="eyebrow" id="intro-eyebrow">— this week on —</div>
+      <h1>
+        <span class="w" id="intro-w1">AGENT</span>
+        <span class="w" id="intro-w2" style="background: linear-gradient(180deg, #f472b6, #c4607e); -webkit-background-clip: text; color: transparent;"> OS</span>
+      </h1>
+      <div class="ep" id="intro-ep">Episode 042</div>
+    </div>
+  </div>
+
+  <!-- OUTRO (80-90s) -->
+  <div class="outro" id="outro">
+    <div>
+      <div class="logo">AGENT OS</div>
+      <div class="tagline">— see you next time —</div>
+      <div style="text-align:center;">
+        <div class="url" style="display: inline-block;">aiprofitboardroom.com</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sparkles -->
+  <span class="sparkle" id="sp1" style="top: 200px; left: 200px;">✨</span>
+  <span class="sparkle" id="sp2" style="top: 400px; right: 200px;">⭐</span>
+  <span class="sparkle" id="sp3" style="top: 700px; left: 300px;">✦</span>
+  <span class="sparkle" id="sp4" style="bottom: 300px; right: 300px;">🌟</span>
+  <span class="sparkle" id="sp5" style="top: 500px; left: 50%;">✨</span>
+</div>
+
+<script>
+  window.__timelines = window.__timelines || {};
+  const tl = gsap.timeline({ paused: true });
+
+  // CHANNEL INTRO (0-5s)
+  tl.to("#intro-eyebrow", { opacity: 1, y: -8, duration: 0.7 }, 0.3)
+    .to(["#intro-w1", "#intro-w2"], { opacity: 1, y: 0, duration: 0.9, stagger: 0.2, ease: "back.out(1.4)" }, 0.8)
+    .to("#intro-ep", { opacity: 1, duration: 0.6 }, 2.2)
+    .to("#intro", { opacity: 0, scale: 1.1, duration: 0.8, ease: "power3.in" }, 4.2);
+
+  // BRAND BARS slide in (5-6s)
+  tl.to("#bar-top", { y: 0, duration: 0.6, ease: "power3.out" }, 5)
+    .to("#bar-bottom", { y: 0, duration: 0.6, ease: "power3.out" }, 5);
+
+  // AVATAR reveal (5-7s) — establish hidden state explicitly via gsap.set so
+  // the timeline animates 0→1 instead of reading 0 from CSS as the end state.
+  gsap.set("#avatar-main", { opacity: 0, scale: 0.5 });
+  tl.to("#avatar-main", { opacity: 1, scale: 1, duration: 1, ease: "back.out(1.4)" }, 5);
+
+  // TOPIC 1 (10-28s)
+  tl.to("#lt-1", { x: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 10)
+    .to("#co-1", { x: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 10.5)
+    .to("#sp1", { opacity: 1, scale: 1.3, duration: 0.5, yoyo: true, repeat: 1 }, 11)
+    .to("#sp2", { opacity: 1, scale: 1.3, duration: 0.5, yoyo: true, repeat: 1 }, 11.5)
+    .to(["#lt-1", "#co-1"], { opacity: 0, x: -80, duration: 0.5 }, 26.5);
+
+  // TOPIC 2 (28-46s)
+  tl.to("#lt-2", { x: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 28)
+    .to("#co-2", { x: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 28.5)
+    .to("#sp3", { opacity: 1, scale: 1.3, duration: 0.5, yoyo: true, repeat: 1 }, 29)
+    .to("#sp5", { opacity: 1, scale: 1.5, duration: 0.5, yoyo: true, repeat: 1 }, 29.5)
+    .to(["#lt-2", "#co-2"], { opacity: 0, x: 80, duration: 0.5 }, 44.5);
+
+  // TOPIC 3 (46-64s)
+  tl.to("#lt-3", { x: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 46)
+    .to("#co-3", { x: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 46.5)
+    .to("#sp4", { opacity: 1, scale: 1.3, duration: 0.5, yoyo: true, repeat: 1 }, 47)
+    .to("#sp2", { opacity: 1, scale: 1.3, duration: 0.5, yoyo: true, repeat: 1 }, 47.5)
+    .to(["#lt-3", "#co-3"], { opacity: 0, y: 60, duration: 0.5 }, 62.5);
+
+  // LIKE & SUBSCRIBE (64-80s)
+  tl.to("#avatar-main", { scale: 0.6, x: 400, opacity: 0.4, duration: 1, ease: "power3.inOut" }, 64)
+    .to("#sub-burst", { opacity: 1, duration: 0.6 }, 64.5)
+    .to("#sub-like", { scale: 1.2, rotation: -15, duration: 0.8, ease: "back.out(2)" }, 65)
+    .to("#sub-like", { rotation: 15, duration: 0.4, yoyo: true, repeat: 7, ease: "sine.inOut" }, 66)
+    .to("#sub-text", { opacity: 1, y: -10, duration: 0.8, ease: "back.out(1.4)" }, 65.5)
+    .to("#sub-sub", { opacity: 1, duration: 0.7 }, 67)
+    .to(["#sub-burst", "#avatar-main"], { opacity: 0, duration: 1, ease: "power3.in" }, 78);
+
+  // BRAND BARS retract (79-80s)
+  tl.to("#bar-top", { y: -100, duration: 0.6, ease: "power3.in" }, 79)
+    .to("#bar-bottom", { y: 100, duration: 0.6, ease: "power3.in" }, 79);
+
+  // OUTRO (80-90s)
+  tl.to("#outro", { opacity: 1, duration: 0.8 }, 80)
+    .from("#outro .logo", { scale: 0.7, opacity: 0, duration: 1, ease: "back.out(1.4)" }, 80.5)
+    .from("#outro .tagline", { y: 20, opacity: 0, duration: 0.7 }, 81.5)
+    .from("#outro .url", { y: 30, opacity: 0, duration: 0.7 }, 82)
+    .to("#outro .url", { scale: 1.05, duration: 0.5, yoyo: true, repeat: 6, ease: "sine.inOut" }, 83);
+
+  window.__timelines["agent-os-vlog"] = tl;
+</script>
+</body>
+</html>

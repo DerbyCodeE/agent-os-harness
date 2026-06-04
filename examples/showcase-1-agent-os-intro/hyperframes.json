@@ -1,0 +1,8 @@
+{
+  "name": "showcase-1-agent-os-intro",
+  "composition": "index.html",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 60
+}

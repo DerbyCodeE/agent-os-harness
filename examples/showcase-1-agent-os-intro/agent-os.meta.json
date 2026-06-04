@@ -1,0 +1,18 @@
+{
+  "prompt": "Showcase #1 — Cinematic 60s intro for Agent OS. Aubergine background with floating particles, gold gradient AGENT OS title with animated underline, seven feature pillars sweeping in, avatar lower-third for talking head section, final CTA with pulsing button.",
+  "createdAt": 1779800000000,
+  "source": "agent-os/video/showcase",
+  "showcase": true,
+  "showcaseId": 1,
+  "title": "Agent OS Intro · 60s cinematic hero",
+  "description": "The opening title sequence for any Agent OS demo — drop your avatar in the slot, render, post.",
+  "estimatedDuration": 60,
+  "scenes": [
+    { "name": "Opening particles", "duration": 8 },
+    { "name": "AGENT OS title reveal", "duration": 6 },
+    { "name": "Seven-agent pillar sweep", "duration": 12 },
+    { "name": "Avatar talking-head section", "duration": 22 },
+    { "name": "Feature highlight bursts", "duration": 8 },
+    { "name": "CTA close", "duration": 4 }
+  ]
+}

@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agent OS — The AI Command Centre That Runs Your Business</title>
+<meta name="description" content="One dashboard. Seven AI agents. Built by Julian Goldie. Get the ready-made setup inside the AI Profit Boardroom." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:    #15101a;
+    --bg-mid:     #1c1622;
+    --bg-card:    #251d2c;
+    --bg-elev:    #2e2436;
+
+    --cream:      #f3ebda;
+    --cream-soft: #ddd0bb;
+    --cream-dim:  #a59783;
+    --cream-mute: #6e6353;
+
+    --gold:       #d4a574;
+    --gold-soft:  #e6c69a;
+    --gold-deep:  #a87f54;
+
+    --emerald:    #5ab896;
+    --plum:       #c4607e;
+    --rust:       #c97c5e;
+
+    --line:       rgba(212, 165, 116, 0.20);
+    --line-soft:  rgba(243, 235, 218, 0.08);
+
+    --shadow-1: 0 1px 0 rgba(243, 235, 218, 0.03), 0 8px 24px rgba(0,0,0,0.5);
+    --shadow-2: 0 2px 0 rgba(243, 235, 218, 0.04), 0 20px 60px rgba(0,0,0,0.55);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  /* Kill browser-default blue/purple link colours globally —
+     every link on this page is styled by us, never by the UA stylesheet. */
+  a, a:link, a:visited, a:hover, a:active {
+    color: inherit;
+    text-decoration: none;
+  }
+  body {
+    background: var(--bg-deep);
+    color: var(--cream);
+    font-family: 'Manrope', -apple-system, system-ui, sans-serif;
+    line-height: 1.65;
+    padding-top: 60px;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Paper grain */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.9  0 0 0 0 0.85  0 0 0 0.035 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.55; mix-blend-mode: overlay;
+  }
+  /* Ambient glow */
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 65% 45% at 12% 6%, rgba(212, 165, 116, 0.09), transparent 60%),
+      radial-gradient(ellipse 55% 40% at 88% 22%, rgba(201, 124, 94, 0.07), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 50% 95%, rgba(196, 96, 126, 0.06), transparent 60%);
+  }
+  main, .sticky-banner { position: relative; z-index: 2; }
+
+  /* Sticky top banner */
+  .sticky-banner {
+    position: fixed; top: 0; left: 0; right: 0; height: 60px;
+    background: rgba(21, 16, 26, 0.88);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid var(--line-soft);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 30px;
+    z-index: 50;
+  }
+  .sticky-banner .left {
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 14px; color: var(--cream-soft);
+  }
+  .sticky-banner .left .pulse {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--emerald);
+    box-shadow: 0 0 10px var(--emerald);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .sticky-banner em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    font-size: 1.4em; color: var(--gold); line-height: 0.9;
+  }
+  .sticky-banner a.join {
+    background: var(--gold); color: var(--bg-deep);
+    font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 9px 20px; border-radius: 999px; text-decoration: none;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+    border: 1px solid var(--gold);
+  }
+  .sticky-banner a.join:hover {
+    background: var(--gold-soft);
+    box-shadow: 0 8px 24px rgba(212, 165, 116, 0.4);
+    transform: translateY(-1px);
+  }
+
+  main { max-width: 860px; margin: 0 auto; padding: 0 32px 120px; }
+
+  /* Chapter eyebrow */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 14px;
+    margin-bottom: 18px; color: var(--cream-dim);
+  }
+  .eyebrow .num {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 1.55rem; color: var(--gold); line-height: 0.9;
+  }
+  .eyebrow .line { width: 36px; height: 1px; background: var(--gold); opacity: 0.6; }
+  .eyebrow .label {
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.72rem; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--cream-dim);
+  }
+
+  /* Headings */
+  h1, h2, h3 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 500;
+    letter-spacing: -0.032em;
+    color: var(--cream);
+    line-height: 1.04;
+  }
+  h1 { font-size: clamp(2.8rem, 6vw, 4.6rem); margin: 18px 0 28px; }
+  h2 { font-size: clamp(2.2rem, 4.5vw, 3.2rem); margin: 12px 0 22px; }
+  h3 { font-size: 1.55rem; letter-spacing: -0.02em; margin: 0 0 12px; }
+  h1 em, h2 em, h3 em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.18em; line-height: 0.9;
+  }
+
+  /* Paragraphs */
+  p { font-size: 1.08rem; line-height: 1.65; color: var(--cream-soft); margin-bottom: 18px; }
+  p.lead { font-size: 1.22rem; line-height: 1.55; color: var(--cream); margin-bottom: 30px; }
+  p .hand {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.5em; line-height: 0.85;
+  }
+
+  code, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  code {
+    font-size: 0.92em; color: var(--gold-soft);
+    background: rgba(212, 165, 116, 0.08); padding: 2px 6px; border-radius: 4px;
+  }
+
+  /* Section spacing + dividers */
+  section { margin: 90px 0; }
+  section:first-of-type { margin-top: 60px; }
+  .divider {
+    display: flex; align-items: center; justify-content: center;
+    gap: 24px; margin: 110px 0;
+  }
+  .divider .rule { flex: 1; height: 1px; background: var(--line); max-width: 180px; }
+  .divider .ornament {
+    color: var(--gold); opacity: 0.7;
+    font-family: 'Caveat', cursive; font-size: 1.8rem;
+  }
+
+  /* Pull quotes */
+  blockquote {
+    margin: 50px 0; padding: 0 0 0 30px;
+    border-left: 2px solid var(--gold);
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 300;
+    font-size: 1.6rem; line-height: 1.4; color: var(--cream);
+    letter-spacing: -0.018em;
+  }
+  blockquote cite {
+    display: block; margin-top: 16px;
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.72rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--gold); font-style: normal;
+  }
+
+  /* Hero image card */
+  .hero-shot {
+    margin: 50px 0 30px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-2);
+    background: var(--bg-card);
+    position: relative;
+  }
+  .hero-shot img { width: 100%; height: auto; display: block; }
+  .hero-shot::after {
+    content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+    background: linear-gradient(to top, rgba(21, 16, 26, 0.5), transparent);
+    pointer-events: none;
+  }
+  .shot-caption {
+    text-align: center;
+    margin-top: 14px;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.78rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--cream-mute);
+  }
+  .shot-caption em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    font-size: 1.5em; color: var(--gold); margin: 0 4px;
+  }
+
+  /* Pillar grid */
+  .pillars {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px; margin: 40px 0;
+  }
+  .pillar {
+    background: var(--bg-card);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    padding: 22px 22px 24px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .pillar:hover { border-color: var(--line); transform: translateY(-2px); }
+  .pillar .num {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 2rem; color: var(--gold); line-height: 0.9; margin-bottom: 8px;
+  }
+  .pillar h3 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.18rem; letter-spacing: -0.015em;
+    color: var(--cream); margin-bottom: 6px;
+  }
+  .pillar p {
+    font-size: 0.94rem; line-height: 1.5; color: var(--cream-soft); margin: 0;
+  }
+
+  /* Inline metric strip */
+  .metric-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 28px;
+    margin: 36px 0;
+    padding: 28px 0;
+    border-top: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .metric-strip .item .label {
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.66rem; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--cream-mute);
+    margin-bottom: 6px;
+  }
+  .metric-strip .item .value {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.15rem; letter-spacing: -0.015em;
+    color: var(--cream);
+  }
+  .metric-strip .item .value em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.5em; line-height: 0.9; margin-right: 4px;
+  }
+
+  /* Big CTA card */
+  .cta-card {
+    margin: 70px 0;
+    padding: 50px 40px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(212, 165, 116, 0.08), rgba(212, 165, 116, 0.02));
+    border: 1px solid var(--line);
+    text-align: center;
+    box-shadow: var(--shadow-2);
+  }
+  .cta-card .eyebrow { justify-content: center; margin-bottom: 12px; }
+  .cta-card h2 { font-size: clamp(1.9rem, 4vw, 2.8rem); margin: 0 0 14px; }
+  .cta-card p { max-width: 540px; margin: 0 auto 28px; font-size: 1.05rem; }
+  .cta-card a.btn {
+    display: inline-block;
+    background: var(--gold); color: var(--bg-deep);
+    font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 0.9rem; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 16px 38px; border-radius: 999px; text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid var(--gold);
+  }
+  .cta-card a.btn:hover {
+    background: var(--gold-soft);
+    box-shadow: 0 12px 36px rgba(212, 165, 116, 0.35);
+    transform: translateY(-1px);
+  }
+  .cta-card .micro {
+    margin-top: 16px;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--cream-mute);
+  }
+
+  /* Comparison list (✓ / ✗) */
+  .checklist { list-style: none; padding: 0; margin: 24px 0; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--line-soft);
+    font-size: 1.02rem; color: var(--cream-soft);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li .check {
+    flex-shrink: 0; width: 18px; height: 18px; margin-top: 4px;
+    border-radius: 50%; display: grid; place-items: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .checklist li.yes .check { background: rgba(90, 184, 150, 0.18); color: var(--emerald); }
+  .checklist li.no  .check { background: rgba(196, 96, 126, 0.18); color: var(--plum); }
+  .checklist li b { color: var(--cream); font-weight: 600; }
+
+  /* Author block */
+  .author {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 32px;
+    margin: 60px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+  }
+  .author .avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--rust));
+    color: var(--bg-deep);
+    display: grid; place-items: center;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  .author h4 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.1rem; color: var(--cream); margin-bottom: 4px;
+  }
+  .author .role {
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 10px;
+  }
+  .author p { font-size: 0.95rem; margin: 0; color: var(--cream-soft); }
+
+  /* Final close section */
+  .final-close {
+    margin: 100px 0 40px;
+    padding: 70px 40px;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(212, 165, 116, 0.15), transparent 60%),
+      var(--bg-card);
+    border: 1px solid var(--gold);
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(243, 235, 218, 0.08);
+  }
+  .final-close h2 {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    margin: 0 0 18px;
+  }
+  .final-close p { max-width: 560px; margin: 0 auto 30px; font-size: 1.1rem; }
+  .final-close .promise {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    color: var(--gold); font-size: 2rem;
+    margin: 30px 0 14px;
+  }
+
+  /* Inline pricing chip */
+  .pricing-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 6px 14px; border-radius: 999px;
+    background: rgba(90, 184, 150, 0.12);
+    border: 1px solid rgba(90, 184, 150, 0.4);
+    color: var(--emerald);
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+
+  ul.body-list {
+    list-style: none; padding: 0; margin: 18px 0 24px;
+  }
+  ul.body-list li {
+    position: relative; padding-left: 22px; margin-bottom: 12px;
+    font-size: 1.04rem; color: var(--cream-soft); line-height: 1.55;
+  }
+  ul.body-list li::before {
+    content: "✦"; position: absolute; left: 0; top: 2px;
+    color: var(--gold); font-family: 'Caveat', cursive; font-size: 1.2rem;
+  }
+
+  /* Responsive 16:9 YouTube embed in the same card frame as hero-shot */
+  .video-shot {
+    position: relative;
+    margin: 50px 0 14px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-2);
+    background: #000;
+    aspect-ratio: 16 / 9;
+  }
+  .video-shot iframe {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    border: 0; display: block;
+  }
+
+  /* Section CTA — every CTA on the page uses this same beautiful card style
+     with the big gold pill button. Compact version of .cta-card, but visually
+     just as strong. Headline + sub + button + micro text. */
+  .section-cta {
+    display: block;
+    margin: 50px 0 14px;
+    padding: 36px 32px 32px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(212, 165, 116, 0.08), rgba(212, 165, 116, 0.02));
+    border: 1px solid var(--line);
+    text-align: center;
+    text-decoration: none;
+    color: inherit;          /* nukes browser default blue link colour */
+    box-shadow: var(--shadow-1);
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s, background 0.25s;
+  }
+  .section-cta:hover {
+    border-color: var(--gold-soft);
+    box-shadow: 0 16px 44px rgba(212, 165, 116, 0.2), var(--shadow-1);
+    transform: translateY(-2px);
+    background: linear-gradient(180deg, rgba(212, 165, 116, 0.12), rgba(212, 165, 116, 0.04));
+  }
+  .section-cta .head {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.55rem; letter-spacing: -0.018em;
+    color: var(--cream); margin-bottom: 8px;
+    line-height: 1.18;
+  }
+  .section-cta .head em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.35em; line-height: 0.9; margin: 0 2px;
+  }
+  .section-cta .sub {
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.92rem; line-height: 1.5;
+    color: var(--cream-soft);
+    max-width: 480px; margin: 0 auto 22px;
+  }
+  .section-cta .pill {
+    display: inline-block;
+    background: var(--gold); color: var(--bg-deep);
+    font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 0.86rem; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 15px 36px; border-radius: 999px;
+    border: 1px solid var(--gold);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .section-cta:hover .pill {
+    background: var(--gold-soft);
+    box-shadow: 0 12px 32px rgba(212, 165, 116, 0.35);
+    transform: translateY(-1px);
+  }
+  .section-cta .micro {
+    margin-top: 14px;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--cream-mute);
+  }
+
+  /* Hero CTA — the one above the fold, even punchier */
+  .hero-cta {
+    margin: 24px 0 14px;
+    padding: 32px 32px 30px;
+    border-radius: 14px;
+    background:
+      radial-gradient(ellipse at 50% 20%, rgba(212, 165, 116, 0.18), transparent 70%),
+      linear-gradient(180deg, rgba(212, 165, 116, 0.08), rgba(212, 165, 116, 0.02));
+    border: 1px solid var(--gold);
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    box-shadow: var(--shadow-2);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 56px rgba(212, 165, 116, 0.28), var(--shadow-2);
+  }
+  .hero-cta .head {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.7rem; letter-spacing: -0.018em;
+    color: var(--cream); margin-bottom: 10px; line-height: 1.18;
+  }
+  .hero-cta .head em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.35em; line-height: 0.9; margin: 0 2px;
+  }
+  .hero-cta .pill {
+    display: inline-block;
+    background: var(--gold); color: var(--bg-deep);
+    font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 0.94rem; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 17px 42px; border-radius: 999px;
+    margin-top: 6px;
+    border: 1px solid var(--gold);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .hero-cta:hover .pill {
+    background: var(--gold-soft);
+    box-shadow: 0 14px 36px rgba(212, 165, 116, 0.4);
+    transform: translateY(-1px);
+  }
+  .hero-cta .micro {
+    margin-top: 14px;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--cream-mute);
+  }
+
+  /* ==========================================================================
+     OLD WAY vs NEW WAY — side-by-side comparison
+     ========================================================================== */
+  .vs-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+    margin: 30px 0 10px;
+  }
+  .vs-grid .col {
+    padding: 28px 26px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+  }
+  .vs-grid .col.old {
+    border-color: rgba(196, 96, 126, 0.32);
+    background: linear-gradient(180deg, rgba(196, 96, 126, 0.06), rgba(196, 96, 126, 0.015));
+  }
+  .vs-grid .col.new {
+    border-color: rgba(90, 184, 150, 0.32);
+    background: linear-gradient(180deg, rgba(90, 184, 150, 0.07), rgba(90, 184, 150, 0.015));
+  }
+  .vs-grid .col h4 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.05rem; letter-spacing: -0.005em;
+    margin-bottom: 16px; color: var(--cream);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .vs-grid .col h4 .tag {
+    font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .vs-grid .col.old h4 .tag { background: rgba(196, 96, 126, 0.18); color: #e69cb3; }
+  .vs-grid .col.new h4 .tag { background: rgba(90, 184, 150, 0.18); color: var(--emerald); }
+  .vs-grid .col ul { list-style: none; padding: 0; }
+  .vs-grid .col li {
+    position: relative; padding-left: 24px; margin-bottom: 12px;
+    font-size: 0.97rem; line-height: 1.55; color: var(--cream-soft);
+  }
+  .vs-grid .col li::before {
+    position: absolute; left: 0; top: 0;
+    font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 0.95rem;
+  }
+  .vs-grid .col.old li::before { content: "✗"; color: #e69cb3; }
+  .vs-grid .col.new li::before { content: "✓"; color: var(--emerald); }
+
+  /* ==========================================================================
+     LIMITING BELIEFS — objection handlers
+     ========================================================================== */
+  .belief-grid {
+    display: grid; grid-template-columns: 1fr; gap: 16px;
+    margin: 26px 0 10px;
+  }
+  .belief {
+    padding: 24px 26px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+  }
+  .belief .q {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.08rem; color: var(--cream); margin-bottom: 8px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .belief .q .you {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 1.45rem; color: var(--gold); line-height: 0.9;
+  }
+  .belief .a {
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.97rem; line-height: 1.6; color: var(--cream-soft);
+  }
+  .belief .a strong { color: var(--cream); }
+
+  /* ==========================================================================
+     TESTIMONIAL WALL — single-column stack, one screenshot at a time.
+     Same readable pattern as the full /testimonials page. We only show a slice
+     here (≈8 wins) and link out for the full wall.
+     ========================================================================== */
+  .testi-wall {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin: 30px 0 10px;
+  }
+  .testi-wall a {
+    display: block;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-1);
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  }
+  .testi-wall a:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold-soft);
+    box-shadow: 0 14px 36px rgba(212, 165, 116, 0.22), var(--shadow-1);
+  }
+  .testi-wall img {
+    width: 100%; height: auto; display: block;
+  }
+  .testi-wall .t-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(21, 16, 26, 0.55);
+    border-top: 1px solid var(--line-soft);
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--cream-mute);
+  }
+  .testi-wall .t-meta .star { color: var(--gold); letter-spacing: 0.04em; }
+
+  /* ==========================================================================
+     VALUE STACK — what you get inside AIPB, line-by-line
+     ========================================================================== */
+  .value-stack {
+    margin: 30px 0 10px;
+    padding: 36px 36px 32px;
+    border-radius: 16px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(212, 165, 116, 0.12), transparent 60%),
+      var(--bg-card);
+    border: 1px solid var(--gold);
+    box-shadow: var(--shadow-2);
+  }
+  .value-stack h3 {
+    text-align: center;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.55rem; letter-spacing: -0.01em;
+    color: var(--cream); margin-bottom: 28px;
+  }
+  .value-stack h3 em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.35em; line-height: 0.9; margin: 0 2px;
+  }
+  .value-stack .row {
+    display: flex; align-items: baseline; gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--line-soft);
+  }
+  .value-stack .row:last-of-type { border-bottom: 0; }
+  .value-stack .row .what {
+    flex: 1;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 1rem; color: var(--cream-soft); line-height: 1.5;
+  }
+  .value-stack .row .what b { color: var(--cream); font-weight: 600; }
+  .value-stack .row .worth {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+    color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .value-stack .total {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 2px solid var(--gold);
+    display: flex; align-items: baseline; gap: 16px;
+  }
+  .value-stack .total .label {
+    flex: 1;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.15rem; color: var(--cream);
+  }
+  .value-stack .total .amount {
+    font-family: 'JetBrains Mono', monospace; font-size: 1.3rem;
+    color: var(--gold); font-weight: 600;
+  }
+  .value-stack .your-price {
+    margin-top: 22px;
+    padding: 22px;
+    background: rgba(90, 184, 150, 0.08);
+    border: 1px solid rgba(90, 184, 150, 0.32);
+    border-radius: 12px;
+    text-align: center;
+  }
+  .value-stack .your-price .small {
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--emerald); margin-bottom: 6px;
+  }
+  .value-stack .your-price .big {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 2.4rem; color: var(--cream); letter-spacing: -0.02em;
+  }
+  .value-stack .your-price .big em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 0.7em; line-height: 0.9;
+  }
+  .value-stack .your-price .micro {
+    margin-top: 6px;
+    font-family: 'Manrope', sans-serif; font-size: 0.82rem;
+    color: var(--cream-soft);
+  }
+
+  /* ==========================================================================
+     FAQ — accordion-style with bold question + supporting answer
+     ========================================================================== */
+  .faq {
+    margin: 26px 0 10px;
+  }
+  .faq details {
+    padding: 18px 24px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .faq details[open] {
+    border-color: var(--gold);
+    background: linear-gradient(180deg, rgba(212, 165, 116, 0.06), rgba(212, 165, 116, 0.015));
+  }
+  .faq summary {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.04rem; color: var(--cream); cursor: pointer;
+    list-style: none; position: relative; padding-right: 32px;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after {
+    content: "+"; position: absolute; right: 0; top: -2px;
+    font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 1.6rem;
+    color: var(--gold); transition: transform 0.2s;
+    line-height: 1;
+  }
+  .faq details[open] summary::after { content: "−"; }
+  .faq .a {
+    margin-top: 14px;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.96rem; line-height: 1.62; color: var(--cream-soft);
+  }
+  .faq .a strong { color: var(--cream); }
+
+  /* ==========================================================================
+     GUARANTEE / RISK REVERSAL — emerald-bordered card
+     ========================================================================== */
+  .guarantee {
+    margin: 36px 0 10px;
+    padding: 36px 36px 32px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(90, 184, 150, 0.08), rgba(90, 184, 150, 0.02));
+    border: 2px solid rgba(90, 184, 150, 0.45);
+    display: grid; grid-template-columns: 110px 1fr; gap: 24px;
+    align-items: center;
+  }
+  .guarantee .seal {
+    width: 110px; height: 110px; border-radius: 50%;
+    background:
+      radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.18), transparent 60%),
+      linear-gradient(135deg, var(--emerald), #3d8e72);
+    color: var(--bg-deep);
+    display: grid; place-items: center;
+    box-shadow: 0 12px 36px rgba(90, 184, 150, 0.3);
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600;
+    text-align: center; line-height: 0.95;
+    border: 3px solid rgba(243, 235, 218, 0.18);
+  }
+  .guarantee .seal .top { font-size: 1.55rem; }
+  .guarantee .seal .mid {
+    font-family: 'Caveat', cursive; font-weight: 500; font-size: 1.05rem;
+    color: var(--bg-deep); opacity: 0.85; margin: 1px 0;
+  }
+  .guarantee .seal .bot {
+    font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase;
+    font-weight: 700;
+  }
+  .guarantee h3 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.35rem; margin-bottom: 8px; color: var(--cream);
+  }
+  .guarantee h3 em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--emerald); font-size: 1.3em; line-height: 0.9;
+  }
+  .guarantee p {
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.96rem; line-height: 1.6; color: var(--cream-soft);
+  }
+
+  /* ==========================================================================
+     PROOF STRIP — what people built using Agent OS
+     ========================================================================== */
+  .proof-strip {
+    margin: 30px 0;
+    padding: 24px 28px;
+    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
+    text-align: center;
+  }
+  .proof-strip .stat .num {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.8rem; color: var(--gold); letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .proof-strip .stat .num em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.3em; line-height: 0.9;
+  }
+  .proof-strip .stat .lbl {
+    margin-top: 6px;
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--cream-mute);
+  }
+
+  /* ==========================================================================
+     URGENCY BAR — soft scarcity without lying
+     ========================================================================== */
+  .urgency {
+    margin: 26px 0 10px;
+    padding: 18px 24px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, rgba(201, 124, 94, 0.12), rgba(196, 96, 126, 0.06));
+    border: 1px solid rgba(201, 124, 94, 0.35);
+    display: flex; align-items: center; gap: 14px;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.96rem; color: var(--cream-soft); line-height: 1.5;
+  }
+  .urgency .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--rust);
+    box-shadow: 0 0 14px var(--rust);
+    flex-shrink: 0;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .urgency b { color: var(--cream); }
+
+  @media (max-width: 640px) {
+    body { padding-top: 56px; }
+    .sticky-banner { padding: 0 16px; }
+    .sticky-banner .left { font-size: 12px; gap: 8px; }
+    .sticky-banner a.join { padding: 8px 14px; font-size: 11px; letter-spacing: 0.14em; }
+    main { padding: 0 18px 80px; }
+    section { margin: 60px 0; }
+    .cta-card, .final-close { padding: 36px 22px; }
+    .vs-grid, .testi-grid { grid-template-columns: 1fr; }
+    .proof-strip { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .guarantee { grid-template-columns: 1fr; text-align: center; }
+    .guarantee .seal { margin: 0 auto; }
+    .value-stack, .guarantee { padding: 28px 22px; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ============ STICKY BANNER ============ -->
+<div class="sticky-banner">
+  <div class="left">
+    <span class="pulse"></span>
+    Join the <strong>AI Profit Boardroom</strong> &mdash; get <em>Agent OS</em>, the templates, daily live rooms
+  </div>
+  <a class="join" href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener">Join AIPB →</a>
+</div>
+
+<main>
+
+<!-- ============ TOP NAV — back-link to the rest of the guides ============ -->
+<div style="display: flex; align-items: center; gap: 16px; font-family: 'Manrope', sans-serif; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cream-mute); margin-top: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line-soft);">
+  <a href="/" style="color: var(--cream-dim); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--cream-dim)'">← All guides</a>
+  <span style="opacity: 0.4;">·</span>
+  <a href="/mythos" style="color: var(--cream-mute); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--cream-mute)'">Claude Mythos</a>
+  <span style="opacity: 0.4;">·</span>
+  <a href="/obsidian" style="color: var(--cream-mute); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--cream-mute)'">Second Brain</a>
+  <span style="opacity: 0.4;">·</span>
+  <a href="/4-hour-rank" style="color: var(--cream-mute); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--cream-mute)'">4-Hour Rank</a>
+  <span style="opacity: 0.4;">·</span>
+  <a href="/codex" style="color: var(--cream-mute); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--cream-mute)'">Goal Engine</a>
+  <span style="opacity: 0.4;">·</span>
+  <a href="/testimonials" style="color: var(--cream-mute); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--cream-mute)'">Testimonials</a>
+</div>
+
+<!-- ============ HERO ============ -->
+<section style="margin-top: 48px;">
+  <div class="eyebrow">
+    <span class="num">I.</span>
+    <span class="line"></span>
+    <span class="label">The Agent OS</span>
+  </div>
+
+  <h1><em>Agent OS</em> — Your AI Command Centre. Built In One Weekend. <em>Used Daily</em> By Thousands.</h1>
+
+  <p class="lead">
+    Stop tinkering with one chatbot. <strong>Agent OS</strong> is the dashboard
+    that wires every AI tool you use — Claude, Codex, Hermes, Gemini, Antigravity,
+    OpenClaw, Free Claude Code — into one beautiful, self-hosted system. Same
+    interface. Shared memory. Preview anything any agent builds. Pay <em>zero</em>
+    per-token costs. This is what it looks like when AI stops being a chat window
+    and starts being your operating system.
+  </p>
+
+  <div class="metric-strip">
+    <div class="item"><div class="label">Agents wired in</div><div class="value"><em>7</em></div></div>
+    <div class="item"><div class="label">Cost per token</div><div class="value"><em>$0</em> via Free Claude Code</div></div>
+    <div class="item"><div class="label">Setup time</div><div class="value"><em>~30</em> min ready-made</div></div>
+    <div class="item"><div class="label">Lives on</div><div class="value">Your <em>own</em> machine</div></div>
+  </div>
+
+  <!-- Hero CTA — above the fold, gold-bordered for maximum pull -->
+  <a class="hero-cta" href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener">
+    <div class="head">Get the <em>full</em> Agent OS setup, ready-made</div>
+    <span class="pill">Join the Boardroom →</span>
+    <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+  </a>
+</section>
+
+<!-- ============ MISSION CONTROL SHOT ============ -->
+<div class="hero-shot">
+  <img src="/sales/01-mission-control.png" alt="Mission Control — seven agents, one dashboard" loading="lazy">
+</div>
+<div class="shot-caption">Mission Control · <em>Seven</em> agents · One screen</div>
+
+<!-- ============ VIDEO 1 — overview ============ -->
+<div class="video-shot">
+  <iframe src="https://www.youtube.com/embed/uyiCvoGfgRQ"
+          title="NEW Hermes Agent OS Just Changed Everything"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="shot-caption">Watch · <em>3 min</em> · The Hermes Agent OS overview</div>
+
+<!-- Inline CTA under Section I -->
+<a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+  <div class="head">Get the <em>full</em> Agent OS setup, ready-made</div>
+  <div class="sub">3,000+ members · 7-day refund · cancel anytime</div>
+  <span class="pill">Join the Boardroom →</span>
+  <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+</a>
+
+<!-- ============ DIVIDER ============ -->
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ II — THE PROBLEM ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">II.</span>
+    <span class="line"></span>
+    <span class="label">Read this first</span>
+  </div>
+
+  <h2>The problem most people <em>do not see</em>.</h2>
+
+  <p class="lead">
+    You open ChatGPT. You ask it to write something. You copy-paste the output
+    into another tab. You search for the file you generated yesterday. You can't
+    find it. You try a different model. You hit a rate limit. You give up and
+    go back to doing it manually.
+  </p>
+
+  <p>
+    The problem is not the AI. The AI is fine. The problem is the <b>interface</b>.
+  </p>
+  <p>
+    You're using AI like a vending machine — one ask, one answer, walk away.
+    Meanwhile the people winning right now are running AI like an
+    <b style="color: var(--gold);">operating system</b>. Memory across sessions.
+    Agents that build things while they sleep. Generated assets that live in one
+    searchable workspace. Voice in. Preview inline. Auto-saved to vault.
+  </p>
+
+  <!-- ============ OLD WAY vs NEW WAY ============ -->
+  <h3 style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500; font-size: 1.4rem; margin: 40px 0 6px; color: var(--cream); letter-spacing: -0.01em;">
+    The <em style="font-family: 'Caveat', cursive; font-style: normal; color: var(--gold); font-size: 1.35em; line-height: 0.9;">old</em> way vs the <em style="font-family: 'Caveat', cursive; font-style: normal; color: var(--gold); font-size: 1.35em; line-height: 0.9;">new</em> way.
+  </h3>
+  <p style="font-size: 0.96rem; color: var(--cream-dim); margin-bottom: 6px;">
+    Same person. Same goal. Two completely different daily workflows.
+  </p>
+
+  <div class="vs-grid">
+    <div class="col old">
+      <h4><span class="tag">Old way</span> Tab-juggling</h4>
+      <ul>
+        <li>14 browser tabs — ChatGPT, Claude, Gemini, Sora, ElevenLabs, Midjourney, NotebookLM, Cursor, Replit, Linear, Notion, Substack, YouTube Studio, Drive</li>
+        <li>Copy-paste from one model into the next, lose half the formatting every time</li>
+        <li>Pay $20/mo for ChatGPT, $20/mo for Claude, $20/mo for Midjourney, $11/mo for ElevenLabs — and you still hit rate limits</li>
+        <li>Generated assets land in random Downloads folders. Two weeks later you can't find that one image you loved</li>
+        <li>No memory. Every chat starts from zero. You re-explain your business 30 times a day</li>
+        <li>Cold start every morning — 25 minutes lost just opening tools before you produce anything</li>
+        <li>You feel like AI is making you faster but the day still ends with the same to-do list</li>
+      </ul>
+    </div>
+    <div class="col new">
+      <h4><span class="tag">New way</span> One dashboard</h4>
+      <ul>
+        <li>One tab. Localhost:3737. Every agent on one screen — Claude, Codex, Hermes, Gemini, Antigravity, OpenClaw, Free Claude Code</li>
+        <li>Same chat box, switch agents with one click. Output from one feeds straight into the next</li>
+        <li>Zero per-token cost via Free Claude Code → OpenRouter proxy. Same Claude CLI. $0 instead of $50+/week</li>
+        <li>Every image, video, audio file, HTML page auto-saves to a searchable Workspace tab. Click → preview inline</li>
+        <li>Persistent memory + Obsidian vault auto-logging. The system already knows your tone, niche, customers</li>
+        <li>Open laptop → dashboard already running → first prompt sent inside 10 seconds</li>
+        <li>You actually finish things. Codex Goal Mode keeps working while you sleep</li>
+      </ul>
+    </div>
+  </div>
+
+  <blockquote>
+    "The gap between people who figured out how to wire AI together and people
+    still copy-pasting between tabs is now bigger than the gap between people
+    with AI and people without it."
+    <cite>— Julian Goldie</cite>
+  </blockquote>
+
+  <!-- Inline CTA under Section II -->
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+  <div class="head">Skip the <em>copy-paste</em> era. Get the wired-up system</div>
+  <div class="sub">members get the full Agent OS install in 30 minutes</div>
+  <span class="pill">Join now →</span>
+  <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+</a>
+</section>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ III — THE VISION ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">III.</span>
+    <span class="line"></span>
+    <span class="label">What you're about to see</span>
+  </div>
+
+  <h2>The Agent OS. One screen, every agent, every output.</h2>
+
+  <p>
+    I run my entire business out of one dashboard. It lives on my machine. Nothing
+    in the cloud. No SaaS bill. No tracking. When I want to chat with Claude
+    Code, I click <b>Claude</b>. When I want to build a video with HyperFrames,
+    I click <b>Hermes</b>. When I want to set a goal and walk away for hours,
+    I click <b>Codex</b>. When I want it all free, I click <b>Free Claude Code</b>.
+  </p>
+
+  <p>
+    Every output gets saved. Every conversation gets logged to my Obsidian vault.
+    Every image, video, HTML page, and audio file Hermes generates renders right
+    inside the dashboard. No more "where did I save that file again?"
+  </p>
+
+  <div class="pillars">
+    <div class="pillar">
+      <div class="num">1.</div>
+      <h3>Mission Control</h3>
+      <p>Live status of every agent. Latency, version, queue depth, model in use. One glance.</p>
+    </div>
+    <div class="pillar">
+      <div class="num">2.</div>
+      <h3>Unified chat</h3>
+      <p>Same chat box, every agent. Type once, route to whichever AI is best for the job.</p>
+    </div>
+    <div class="pillar">
+      <div class="num">3.</div>
+      <h3>Workspace previews</h3>
+      <p>Anything any agent builds — HTML apps, MP4 videos, images, audio — renders inline.</p>
+    </div>
+    <div class="pillar">
+      <div class="num">4.</div>
+      <h3>Vault memory</h3>
+      <p>Auto-logged to your Obsidian vault. Searchable. Forever. No data lock-in.</p>
+    </div>
+  </div>
+
+  <!-- Inline CTA under Section III -->
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+  <div class="head">Want this <em>exact</em> dashboard on your machine?</div>
+  <div class="sub">install walk-through + source files + live calls inside the Boardroom</div>
+  <span class="pill">See inside →</span>
+  <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+</a>
+</section>
+
+<!-- ============ HERMES WORKSPACE SHOT ============ -->
+<div class="hero-shot">
+  <img src="/sales/02-hermes-workspace.png" alt="Hermes Workspace — 23 HTML apps, live preview pane" loading="lazy">
+</div>
+<div class="shot-caption">Hermes Workspace · <em>23</em> HTML apps · Live iframe preview</div>
+
+<p style="margin-top: 36px;">
+  Above: the Hermes agent's Workspace tab. Every HTML app, page, and asset I've
+  ever asked Hermes to build, surfaced automatically. Click any → it renders
+  live in the preview pane on the right. The cinematic image is the cover of
+  one of my Agent OS guides — generated by Hermes from a 6-word prompt.
+</p>
+
+<!-- ============ VIDEO 2 — Hermes deep-dive ============ -->
+<div class="video-shot">
+  <iframe src="https://www.youtube.com/embed/hGnn05ccwNc"
+          title="Hermes Agent OS is INSANE"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="shot-caption">Watch · Hermes Agent OS · <em>Deep-dive</em> walk-through</div>
+
+<!-- ============ SOFT CTA #1 ============ -->
+<div class="cta-card">
+  <div class="eyebrow">
+    <span class="num">★</span>
+    <span class="line"></span>
+    <span class="label">Skip the setup pain</span>
+  </div>
+  <h2>Want this dashboard <em>ready-made</em>?</h2>
+  <p>
+    The full setup — every agent wired in, the design system applied, the workspace previews working out of the box — lives inside the AI Profit Boardroom. Members get the install + the source + a walk-through.
+  </p>
+  <a class="btn" href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener">Join the Boardroom</a>
+  <div class="micro">3,000+ members · 7-day no-questions refund</div>
+</div>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ IV — FREE CLAUDE CODE ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">IV.</span>
+    <span class="line"></span>
+    <span class="label">The zero-cost agent</span>
+  </div>
+
+  <h2>Free Claude Code. Same CLI. <em>$0</em> per token.</h2>
+
+  <p class="lead">
+    Anthropic's Claude is the gold standard for coding agents. But the bill adds
+    up fast — $15 per million output tokens. Run it all day, you're at $50+ a
+    week. We route it through a local proxy to OpenRouter. Same exact tooling.
+    Zero per-token cost. <span class="pricing-chip">↘ saves 90%+</span>
+  </p>
+</section>
+
+<div class="hero-shot">
+  <img src="/sales/03-free-claude-code.png" alt="Free Claude Code — Pomodoro timer rendered inline" loading="lazy">
+</div>
+<div class="shot-caption">Free Claude Code · <em>Built</em> a Pomodoro app · Preview pane right side</div>
+
+<p>
+  Above: I asked Free Claude Code to "build me a Pomodoro timer in HTML."
+  Ten seconds later, the .html file was in the workspace + rendering live in
+  the preview pane on the right. Click Preview / Source / New tab / Save / Copy.
+  That's the workflow — ask, build, ship.
+</p>
+
+<ul class="checklist" style="margin-top: 30px;">
+  <li class="yes"><span class="check">✓</span><span><b>Same Claude Code CLI.</b> Same interface, same tool use, same MCPs.</span></li>
+  <li class="yes"><span class="check">✓</span><span><b>Owl Alpha by default.</b> Free 1M-context model on OpenRouter. Or swap to any model.</span></li>
+  <li class="yes"><span class="check">✓</span><span><b>Workspace preview.</b> Anything Claude writes → click → renders inline.</span></li>
+  <li class="yes"><span class="check">✓</span><span><b>Persistent history.</b> Auto-saved to localStorage. Never lose a conversation.</span></li>
+  <li class="no"><span class="check">✗</span><span><b>No Anthropic bill.</b> Zero per-token cost. Forever.</span></li>
+</ul>
+
+<!-- Inline CTA under Section IV -->
+<a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+  <div class="head">Get the Free Claude Code setup, <em>done for you</em></div>
+  <div class="sub">save $50+ / week vs direct Anthropic — same tooling</div>
+  <span class="pill">Save 90% →</span>
+  <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+</a>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ V — STUDIO ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">V.</span>
+    <span class="line"></span>
+    <span class="label">The creative tier</span>
+  </div>
+
+  <h2>Studio. <em>Voice in</em>. Image, video, speech out.</h2>
+
+  <p>
+    I describe what I want. Hermes builds it. The output lands in the Studio
+    grid where I can preview it, play it, save it. No third-party tools. No
+    upload-download-upload cycle. The dragon in the screenshot below? Built from
+    a one-sentence prompt while I was making tea.
+  </p>
+</section>
+
+<div class="hero-shot">
+  <img src="/sales/04-studio.png" alt="Studio — 3 generated videos including a dragon over Tokyo" loading="lazy">
+</div>
+<div class="shot-caption">Studio · <em>3</em> generated videos · Voice prompt → finished render</div>
+
+<div class="pillars">
+  <div class="pillar">
+    <div class="num">📷</div>
+    <h3>Images</h3>
+    <p>Type or speak a prompt. Get high-res images in seconds. Saved to your vault automatically.</p>
+  </div>
+  <div class="pillar">
+    <div class="num">🎬</div>
+    <h3>Videos</h3>
+    <p>Veo, HyperFrames, Remotion — pick your engine. 5-second clips to 30-second narratives.</p>
+  </div>
+  <div class="pillar">
+    <div class="num">🔊</div>
+    <h3>Speech</h3>
+    <p>TTS via Whisper, Riva, or local. Voice cloning supported. Used for shorts + voiceovers.</p>
+  </div>
+</div>
+
+<!-- Inline CTA under Section V -->
+<a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+  <div class="head">Build images, videos, voiceovers from <em>one</em> prompt</div>
+  <div class="sub">Studio is part of the full Agent OS package inside the Boardroom</div>
+  <span class="pill">Get Studio →</span>
+  <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+</a>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ VI — NOTEBOOK ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">VI.</span>
+    <span class="line"></span>
+    <span class="label">The research layer</span>
+  </div>
+
+  <h2>NotebookLM. Wired straight into your dashboard.</h2>
+
+  <p>
+    I dump every URL, every PDF, every transcript into NotebookLM. Then I
+    generate audio overviews, infographics, and mind maps. All of it shows up
+    in the Notebook tab + saves to my Obsidian vault. The audio plays inline.
+    The video assets render inline. Searchable forever.
+  </p>
+</section>
+
+<div class="hero-shot">
+  <img src="/sales/05-notebook.png" alt="Notebook — NotebookLM audio overviews + saved assets" loading="lazy">
+</div>
+<div class="shot-caption">Notebook · NotebookLM assets · <em>9</em> notebooks · <em>5</em> saved overviews</div>
+
+<p>
+  Above: my Notebook tab. Audio overviews from NotebookLM playing inline.
+  AI: Co-worker, Economy, Control. OpenClaw: Your AI, Your Risk. Architecture
+  diagrams + power-and-peril deep dives. Each one is a 19-minute audio overview
+  I generated in 30 seconds from a Skool community URL.
+</p>
+
+<!-- Inline CTA under Section VI -->
+<a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+  <div class="head">Pull NotebookLM into <em>your</em> dashboard too</div>
+  <div class="sub">research → audio → vault, all in one wired-up flow</div>
+  <span class="pill">Get the system →</span>
+  <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+</a>
+
+<!-- ============ SOFT CTA #2 ============ -->
+<div class="cta-card">
+  <div class="eyebrow">
+    <span class="num">★</span>
+    <span class="line"></span>
+    <span class="label">This is the system</span>
+  </div>
+  <h2>What you've seen so far is <em>the dashboard</em>.</h2>
+  <p>
+    The setup is the hard part. Wiring seven agents together, applying the design system, building the preview iframe pattern, configuring the proxy. That's what AI Profit Boardroom members get out of the box.
+  </p>
+  <a class="btn" href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener">See What's Inside</a>
+  <div class="micro">$0 setup fee · cancel anytime</div>
+</div>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ VII — CODEX + GOAL MODE ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">VII.</span>
+    <span class="line"></span>
+    <span class="label">The autonomous tier</span>
+  </div>
+
+  <h2>Codex Goal Mode. Set the target. Walk away.</h2>
+
+  <p>
+    This is the one most people don't even know exists yet. Codex's Goal Mode
+    lets you hand the agent a long-horizon objective — "build me a 3-page
+    landing site for an AI tutoring service" — and it runs <code>--full-auto</code>
+    in a dedicated scratch dir until the goal is met. Hours or days.
+  </p>
+
+  <ul class="body-list">
+    <li>I set a goal at 11pm: "Generate 5 unique blog posts about AI automation, formatted for Netlify deploy"</li>
+    <li>I wake up at 7am</li>
+    <li>5 blog posts are in my workspace, ready to push live</li>
+    <li>Total cost: 0 (Codex via ChatGPT Pro, already paid for)</li>
+  </ul>
+
+  <p>
+    That's what running AI like an operating system looks like. While you sleep,
+    the work happens. The Goal Mode timeline shows every command, every file
+    written, every assistant message — like watching a junior developer work,
+    without paying a junior developer.
+  </p>
+</section>
+
+<div class="hero-shot">
+  <img src="/sales/06-codex.png" alt="Codex — Goal Mode timeline with live commands + assistant messages" loading="lazy">
+</div>
+<div class="shot-caption">Codex · <em>Goal Mode</em> · Long-running autonomous builds</div>
+
+<!-- Inline CTA under Section VII -->
+<a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+  <div class="head">Run AI <em>while you sleep</em>. Wake up to finished work</div>
+  <div class="sub">Goal Mode + sessions browser wired into the Agent OS</div>
+  <span class="pill">Unlock it →</span>
+  <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+</a>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ VIII — WHO THIS IS FOR ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">VIII.</span>
+    <span class="line"></span>
+    <span class="label">Be honest with yourself</span>
+  </div>
+
+  <h2>Is the Agent OS for <em>you</em>?</h2>
+
+  <ul class="checklist">
+    <li class="yes"><span class="check">✓</span><span><b>You run a business and want AI to be invisible infrastructure</b> — not another chrome tab you babysit.</span></li>
+    <li class="yes"><span class="check">✓</span><span><b>You've used ChatGPT, Claude, Gemini</b> — and you're frustrated they don't talk to each other.</span></li>
+    <li class="yes"><span class="check">✓</span><span><b>You want everything on your own machine</b> — no SaaS lock-in, no data leaving your laptop.</span></li>
+    <li class="yes"><span class="check">✓</span><span><b>You're willing to spend 30 minutes setting it up once</b> — to save 30 minutes every day forever.</span></li>
+    <li class="no"><span class="check">✗</span><span><b>You're looking for a magic AI tool that "does it all for you."</b> This is power tooling, not a button.</span></li>
+    <li class="no"><span class="check">✗</span><span><b>You don't want to learn anything new.</b> The system is simple, but it's not zero-effort.</span></li>
+  </ul>
+
+  <!-- Inline CTA under Section VIII -->
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+  <div class="head">If you said <em>yes</em> to most of those, you're a fit</div>
+  <div class="sub">3,000+ members already running this stack daily</div>
+  <span class="pill">Join now →</span>
+  <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+</a>
+</section>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ VIII.5 — LIMITING BELIEFS ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">IX.</span>
+    <span class="line"></span>
+    <span class="label">The voice in your head</span>
+  </div>
+
+  <h2>"But I'm <em>not</em>…"</h2>
+
+  <p class="lead">
+    Every single person who said yes to Agent OS was talking themselves out of it
+    five minutes before they joined. Here's what the voice in your head is probably
+    saying — and what's actually true.
+  </p>
+
+  <div class="belief-grid">
+
+    <div class="belief">
+      <div class="q"><span class="you">You:</span> "I'm not technical. This sounds like a developer thing."</div>
+      <div class="a">
+        <strong>Reality:</strong> If you can copy-paste a single command and click "open" on a folder, you can run this. The whole point of the system is that I did the technical part once so you never have to. Members go from "I've never touched a terminal" to "my whole business runs through this dashboard" inside one weekend. The install walk-through is 11 minutes long. That's it.
+      </div>
+    </div>
+
+    <div class="belief">
+      <div class="q"><span class="you">You:</span> "I don't have time to learn another system right now."</div>
+      <div class="a">
+        <strong>Reality:</strong> You're already using AI — you're just using it the slow way. The 30 minutes you spend setting Agent OS up gives back 30 minutes a day. That's 180+ hours a year. The math is unfair. The real question isn't "do I have time for this" — it's "how much more time am I going to lose by not having it?"
+      </div>
+    </div>
+
+    <div class="belief">
+      <div class="q"><span class="you">You:</span> "I'm already paying for ChatGPT Plus. I don't need more AI tools."</div>
+      <div class="a">
+        <strong>Reality:</strong> Agent OS isn't another AI tool. It's the operating system that runs <em>all</em> of them at once — including the ChatGPT Plus you're already paying for. Plus you stop paying $50+/week for Anthropic tokens because Free Claude Code does it for $0. The Boardroom price pays itself back in 4 weeks just on the saved Anthropic bill.
+      </div>
+    </div>
+
+    <div class="belief">
+      <div class="q"><span class="you">You:</span> "What if I buy it and don't use it?"</div>
+      <div class="a">
+        <strong>Reality:</strong> You have 7 full days to try every agent, run the install, sit in a live call, and decide. If it's not for you, send one Skool message and you get every penny back. No "how do I cancel" maze. Two clicks. The reason 3,000+ members are still here is they use it every single day.
+      </div>
+    </div>
+
+    <div class="belief">
+      <div class="q"><span class="you">You:</span> "I'm not building an AI business — I run a {coaching / agency / SaaS / e-com / content} business."</div>
+      <div class="a">
+        <strong>Reality:</strong> Even better. Agent OS is for people who run real businesses and want AI to be invisible infrastructure underneath them — not for people who want to <em>be</em> an AI business. The members inside the Boardroom run agencies, ecom stores, content brands, coaching practices, SaaS companies. The system doesn't care what you sell. It just makes the engine room faster.
+      </div>
+    </div>
+
+    <div class="belief">
+      <div class="q"><span class="you">You:</span> "I tried setting something like this up myself. It broke."</div>
+      <div class="a">
+        <strong>Reality:</strong> So did I, six times, before the version you see now. The difference is — I already did the breaking. The version inside the Boardroom is the one that works on day one. Plus you have me + 3,000 members in the chat the moment anything errors out. You're not figuring it out alone like last time.
+      </div>
+    </div>
+
+    <div class="belief">
+      <div class="q"><span class="you">You:</span> "I'll come back to this when I have more time / money / clarity."</div>
+      <div class="a">
+        <strong>Reality:</strong> That's the same sentence that's been keeping you exactly where you are for the last 12 months. The window where AI is this far ahead of "how most people use it" is closing. Six months from now this is going to be normal — and the people who set it up now will be 6 months ahead of the people who didn't. The cost of waiting is bigger than the cost of joining.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Inline CTA after limiting beliefs -->
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+    <div class="head">Stop talking yourself <em>out</em> of it</div>
+    <div class="sub">7-day refund means there's no risk to finding out for yourself</div>
+    <span class="pill">Join AIPB →</span>
+    <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+  </a>
+</section>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ X — TESTIMONIALS ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">X.</span>
+    <span class="line"></span>
+    <span class="label">What members say</span>
+  </div>
+
+  <h2>258 <em>real</em> wins. Not testimonials. Screenshots.</h2>
+
+  <p class="lead">
+    No invented names, no "Sarah K. from Austin" copywriter quotes. Every
+    screenshot below is an unedited capture from a real Boardroom member —
+    posted in the Skool community, untouched. Here's a handful —
+    <a href="/testimonials" style="color: var(--gold); border-bottom: 1px dotted var(--gold);">see all 258 on the wall →</a>
+  </p>
+
+  <div class="testi-wall">
+    <a href="/testimonials" target="_blank" rel="noopener">
+      <img src="/images/testimonials/image172.png" alt="AIPB member win — real screenshot" loading="lazy" />
+      <div class="t-meta"><span>Real member win</span><span class="star">★★★★★</span></div>
+    </a>
+    <a href="/testimonials" target="_blank" rel="noopener">
+      <img src="/images/testimonials/image133.png" alt="AIPB member win — real screenshot" loading="lazy" />
+      <div class="t-meta"><span>Real member win</span><span class="star">★★★★★</span></div>
+    </a>
+    <a href="/testimonials" target="_blank" rel="noopener">
+      <img src="/images/testimonials/image109.png" alt="AIPB member win — real screenshot" loading="lazy" />
+      <div class="t-meta"><span>Real member win</span><span class="star">★★★★★</span></div>
+    </a>
+    <a href="/testimonials" target="_blank" rel="noopener">
+      <img src="/images/testimonials/image60.png" alt="AIPB member win — real screenshot" loading="lazy" />
+      <div class="t-meta"><span>Real member win</span><span class="star">★★★★★</span></div>
+    </a>
+    <a href="/testimonials" target="_blank" rel="noopener">
+      <img src="/images/testimonials/image182.png" alt="AIPB member win — real screenshot" loading="lazy" />
+      <div class="t-meta"><span>Real member win</span><span class="star">★★★★★</span></div>
+    </a>
+    <a href="/testimonials" target="_blank" rel="noopener">
+      <img src="/images/testimonials/image171.png" alt="AIPB member win — real screenshot" loading="lazy" />
+      <div class="t-meta"><span>Real member win</span><span class="star">★★★★★</span></div>
+    </a>
+    <a href="/testimonials" target="_blank" rel="noopener">
+      <img src="/images/testimonials/image139.png" alt="AIPB member win — real screenshot" loading="lazy" />
+      <div class="t-meta"><span>Real member win</span><span class="star">★★★★★</span></div>
+    </a>
+    <a href="/testimonials" target="_blank" rel="noopener">
+      <img src="/images/testimonials/image138.png" alt="AIPB member win — real screenshot" loading="lazy" />
+      <div class="t-meta"><span>Real member win</span><span class="star">★★★★★</span></div>
+    </a>
+  </div>
+
+  <div style="text-align: center; margin: 28px 0 6px;">
+    <a href="/testimonials" target="_blank" rel="noopener"
+       style="display: inline-block; padding: 13px 30px; border-radius: 999px;
+              border: 1px solid var(--gold); color: var(--cream); font-family: 'Manrope', sans-serif;
+              font-weight: 600; font-size: 0.86rem; letter-spacing: 0.16em; text-transform: uppercase;
+              background: rgba(212,165,116,0.06);
+              transition: background 0.2s, transform 0.2s, box-shadow 0.2s;"
+       onmouseover="this.style.background='rgba(212,165,116,0.14)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 10px 28px rgba(212,165,116,0.25)';"
+       onmouseout="this.style.background='rgba(212,165,116,0.06)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+      See all 258 wins →
+    </a>
+  </div>
+
+  <div class="proof-strip">
+    <div class="stat">
+      <div class="num"><em>258</em>+</div>
+      <div class="lbl">Real wins</div>
+    </div>
+    <div class="stat">
+      <div class="num"><em>3,000</em>+</div>
+      <div class="lbl">Members</div>
+    </div>
+    <div class="stat">
+      <div class="num"><em>7</em></div>
+      <div class="lbl">Agents wired in</div>
+    </div>
+    <div class="stat">
+      <div class="num"><em>$0</em></div>
+      <div class="lbl">Per-token cost</div>
+    </div>
+  </div>
+
+  <!-- Inline CTA after testimonials -->
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+    <div class="head">Join the <em>3,000</em>+ already running this stack</div>
+    <div class="sub">Daily live calls · install walk-through · full source files</div>
+    <span class="pill">See inside →</span>
+    <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+  </a>
+</section>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ XI — WHO BUILT IT ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">XI.</span>
+    <span class="line"></span>
+    <span class="label">Who built this</span>
+  </div>
+
+  <h2>Built by someone who actually uses it. Daily.</h2>
+
+  <div class="author">
+    <div class="avatar">JG</div>
+    <div>
+      <h4>Julian Goldie</h4>
+      <div class="role">Founder · Goldie Agency · AI Profit Boardroom</div>
+      <p>
+        I run a 7-figure agency. I publish daily on YouTube, daily Substack, and
+        a weekly podcast. None of it happens without the Agent OS. I built this
+        because the alternative — twelve browser tabs, three terminals, and a
+        broken Obsidian — was killing me. Now it's just one dashboard.
+      </p>
+    </div>
+  </div>
+
+  <p>
+    The members inside the AI Profit Boardroom get the exact same setup I run
+    every day from my studio in Bangkok. Same agents, same design system, same workflow.
+    Plus the install walk-through, the Skool community, and weekly live calls
+    where I show what's new.
+  </p>
+
+  <!-- Inline CTA under Section XI -->
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+  <div class="head">Run the <em>same</em> stack I use every day</div>
+  <div class="sub">install walk-through · weekly live calls · Skool community</div>
+  <span class="pill">Join Julian →</span>
+  <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+</a>
+</section>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ XII — WHAT YOU GET (VALUE STACK) ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">XII.</span>
+    <span class="line"></span>
+    <span class="label">Everything you get inside</span>
+  </div>
+
+  <h2>What you actually <em>get</em> when you join.</h2>
+
+  <p class="lead">
+    Agent OS is the headline. The Boardroom is the whole machine. Here's everything
+    that's waiting for you the moment you click join.
+  </p>
+
+  <div class="value-stack">
+    <h3>The full <em>Agent OS</em> stack</h3>
+
+    <div class="row">
+      <div class="what"><b>The full Agent OS source code</b> — every agent wired in, design system applied, preview pane working out of the box. Drop into your machine, run one command, you're live.</div>
+      <div class="worth">$497</div>
+    </div>
+    <div class="row">
+      <div class="what"><b>Free Claude Code installer</b> — the local proxy that routes Claude CLI to OpenRouter. Same tooling, $0 per token. Saves ~$200/month forever.</div>
+      <div class="worth">$197</div>
+    </div>
+    <div class="row">
+      <div class="what"><b>Hermes Workspace + Studio</b> — the agent that builds images, videos, voiceovers, HTML apps and previews them inline. The HyperFrames + Remotion wiring is the part that took me 6 weeks.</div>
+      <div class="worth">$297</div>
+    </div>
+    <div class="row">
+      <div class="what"><b>Codex Goal Mode kit</b> — the long-horizon autonomous agent setup. Set goals at night, wake up to finished work. Includes my exact prompt library.</div>
+      <div class="worth">$197</div>
+    </div>
+    <div class="row">
+      <div class="what"><b>NotebookLM integration</b> — wired straight into your dashboard. Audio overviews, infographics, mind maps. Auto-saved to your Obsidian vault.</div>
+      <div class="worth">$147</div>
+    </div>
+    <div class="row">
+      <div class="what"><b>11-minute install walk-through</b> — me on screen, you following along, zero black boxes. "Never opened a terminal" to "live dashboard" in one weekend.</div>
+      <div class="worth">$97</div>
+    </div>
+    <div class="row">
+      <div class="what"><b>Weekly live calls</b> — every Thursday I show what's new, fix what's stuck, and demo the next agent going into the stack. Recordings stay forever.</div>
+      <div class="worth">$197 / mo</div>
+    </div>
+    <div class="row">
+      <div class="what"><b>Skool community of 3,000+ founders</b> — agency owners, ecom founders, coaches, SaaS builders. Ask anything. Someone built it last week.</div>
+      <div class="worth">priceless</div>
+    </div>
+    <div class="row">
+      <div class="what"><b>Prompt library — 200+ field-tested prompts</b> for content, SEO, sales pages, voice clones, video scripts. Everything I actually use in my agency.</div>
+      <div class="worth">$147</div>
+    </div>
+    <div class="row">
+      <div class="what"><b>Lifetime updates to the Agent OS</b> — every new agent I wire in, every workflow upgrade, every design system refresh. You get it the same day I do.</div>
+      <div class="worth">$497</div>
+    </div>
+
+    <div class="total">
+      <div class="label">Total real-world value</div>
+      <div class="amount">$2,273+</div>
+    </div>
+
+    <div class="your-price">
+      <div class="small">Your investment today</div>
+      <div class="big">$59<em>/mo</em></div>
+      <div class="micro">Cancel in 2 clicks. 7-day no-questions refund. No contracts.</div>
+    </div>
+  </div>
+
+  <!-- Inline CTA after value stack -->
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+    <div class="head">Lock in your <em>seat</em> in the Boardroom</div>
+    <div class="sub">cheaper than the Anthropic bill you're already paying — and you get everything above</div>
+    <span class="pill">Claim it now →</span>
+    <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+  </a>
+</section>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ XIII — FAQ ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">XIII.</span>
+    <span class="line"></span>
+    <span class="label">The questions everyone asks</span>
+  </div>
+
+  <h2>Every <em>objection</em>, answered.</h2>
+
+  <p class="lead">
+    These are the exact questions I get every week before someone joins. I've put
+    the honest answers here so you can decide without booking a call.
+  </p>
+
+  <div class="faq">
+
+    <details>
+      <summary>Will this run on my laptop? What if I'm on Windows / Linux / older hardware?</summary>
+      <div class="a">
+        <strong>Yes.</strong> Agent OS is a Next.js dashboard plus a handful of CLI tools — it runs anywhere Node.js runs. macOS, Windows, Linux, Apple Silicon, Intel, even a 2018 MacBook Air. The heavy lifting happens in the cloud through APIs, the dashboard itself is light. Members have it running on everything from a £400 Chromebook to a Mac Studio.
+      </div>
+    </details>
+
+    <details>
+      <summary>I'm not a coder. Can I actually install this?</summary>
+      <div class="a">
+        <strong>Yes.</strong> The install is one paste-into-terminal command, followed by clicking through a setup wizard. The walk-through video is 11 minutes long. Members who had literally never opened a terminal before are running it. If you get stuck, drop one message in the Skool chat — usually answered inside an hour. You're not figuring it out alone.
+      </div>
+    </details>
+
+    <details>
+      <summary>What does it actually cost to run? Are there hidden bills?</summary>
+      <div class="a">
+        <strong>$0 per token via Free Claude Code.</strong> That's the headline. If you want to use paid models (GPT-5, Claude Sonnet, Veo) you bring your own API keys and pay the model providers directly — no markup from me. Most members run on free + ChatGPT Plus they already pay for. There is no per-seat, no per-message, no upsell. Your only ongoing cost is the Boardroom membership itself.
+      </div>
+    </details>
+
+    <details>
+      <summary>How is this different from just using ChatGPT / Claude / Cursor on their own?</summary>
+      <div class="a">
+        Those are great <em>tools</em>. Agent OS is the <em>operating system</em> that runs them all together. One chat box → seven agents. Shared memory. One Workspace where every output lives. Inline preview of anything. Auto-save to your vault. Codex Goal Mode running while you sleep. None of that exists in any single tool. The difference is the same as the difference between owning a hammer and owning a workshop.
+      </div>
+    </details>
+
+    <details>
+      <summary>Do I need to give you my OpenAI / Anthropic / Google API keys?</summary>
+      <div class="a">
+        <strong>No.</strong> Agent OS runs on your machine. Your keys stay in your local <code>.env</code> file. Nothing leaves your laptop. No telemetry, no analytics, no "phone home." You can run it fully offline-air-gapped if you want. This is by design — I wanted the thing I'd want to use, not a SaaS product.
+      </div>
+    </details>
+
+    <details>
+      <summary>How long does setup take, honestly?</summary>
+      <div class="a">
+        <strong>30 minutes if you follow the walk-through.</strong> About 12 of those minutes are just waiting for dependencies to install while you make tea. The actual hands-on time is closer to 15 minutes. Members who already have Node.js installed have done the whole thing in under 10. Plan a Saturday morning for it. By lunchtime you're using it.
+      </div>
+    </details>
+
+    <details>
+      <summary>What if I cancel — do I keep the Agent OS files?</summary>
+      <div class="a">
+        <strong>You keep everything you've downloaded.</strong> The source files, the prompts, the install — all of it stays on your machine. What you lose access to is the Skool community, the weekly live calls, and the future updates. So you'd still have a working Agent OS — just frozen at the version you last downloaded. Most members stay specifically because the updates keep coming.
+      </div>
+    </details>
+
+    <details>
+      <summary>Is there a refund if I hate it?</summary>
+      <div class="a">
+        <strong>7-day, no-questions, full refund.</strong> Drop one Skool message. Money back inside 24 hours. No "tell us why" form, no "try harder, here's a discount" maze. We refund people every month — it's a normal part of running a community. The reason 3,000+ members stay is they use it. The reason refunds are rare is because people who don't use it just leave inside the first week.
+      </div>
+    </details>
+
+    <details>
+      <summary>Will this still be relevant in 6 months? AI moves fast.</summary>
+      <div class="a">
+        <strong>That's exactly why this exists.</strong> Agent OS is the dashboard layer — the agents inside it are swappable. The day a better model drops, we wire it in. The day a new tool releases, we add a tab for it. That's what your lifetime updates buy. The whole point of an OS is that it outlasts any individual app running on top of it. The interface stays. The contents upgrade. Forever.
+      </div>
+    </details>
+
+    <details>
+      <summary>I've bought "AI systems" before. They've all been hype. Why is this different?</summary>
+      <div class="a">
+        <strong>Because this isn't a system I'm selling — it's the system I actually run my own business on.</strong> The dashboard you've seen in the screenshots is the same one I'm logged into right now publishing this page. If it broke, my YouTube channel would break, my Substack would break, my client work would break. The product and the thing I depend on every day are literally the same code. That's why it works — I cannot afford for it not to.
+      </div>
+    </details>
+
+    <details>
+      <summary>What if I just want to ask one question before joining?</summary>
+      <div class="a">
+        Drop a DM on Skool (free to message) or reply to any of my emails — I read every one. But honestly: the 7-day refund makes asking unnecessary. The cost of joining and looking inside for a week is lower than the cost of going back and forth on email. Just look inside.
+      </div>
+    </details>
+
+  </div>
+
+  <!-- Inline CTA after FAQ -->
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+    <div class="head">Got your answer? <em>Come</em> see it from inside</div>
+    <div class="sub">7-day refund means asking from the inside is cheaper than asking from out here</div>
+    <span class="pill">Join AIPB →</span>
+    <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+  </a>
+</section>
+
+<div class="divider">
+  <span class="rule"></span><span class="ornament">✦</span><span class="rule"></span>
+</div>
+
+<!-- ============ XIV — GUARANTEE / RISK REVERSAL ============ -->
+<section>
+  <div class="eyebrow">
+    <span class="num">XIV.</span>
+    <span class="line"></span>
+    <span class="label">The risk is on me</span>
+  </div>
+
+  <h2>You don't decide today. You decide <em>after</em> you've seen it.</h2>
+
+  <div class="guarantee">
+    <div class="seal">
+      <div>
+        <div class="top">7</div>
+        <div class="mid">days</div>
+        <div class="bot">Refund</div>
+      </div>
+    </div>
+    <div>
+      <h3>The <em>no-tricks</em> 7-day refund.</h3>
+      <p>
+        Join today, get the full Agent OS download, sit in a live call, install the
+        dashboard, try every agent. If at any point in the first 7 days you decide
+        it's not for you — one Skool DM, money back, no questions, no "let's hop on
+        a call to retain you," no friction. You keep every file you've downloaded.
+        That's it. <strong>The only way you lose is if you don't try.</strong>
+      </p>
+    </div>
+  </div>
+
+  <div class="urgency">
+    <span class="dot"></span>
+    <span>
+      <b>Heads up:</b> the $59/mo price is locked in for the life of your
+      membership — but the price for <em>new</em> joiners goes up as the system
+      grows. Every new agent I wire in raises the bar.
+      Today's price is the lowest it will ever be.
+    </span>
+  </div>
+
+  <!-- Inline CTA after guarantee -->
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+    <div class="head">Lock today's <em>price</em> — risk is mine for 7 days</div>
+    <div class="sub">$59/mo for everything above · refundable for any reason</div>
+    <span class="pill">Join the Boardroom →</span>
+    <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+  </a>
+</section>
+
+<!-- ============ FINAL CLOSE ============ -->
+<div class="final-close">
+  <div class="promise">— ready when you are —</div>
+  <h2>Two paths. <em>Pick one.</em></h2>
+  <p style="max-width: 620px;">
+    Close this tab. Keep doing AI the slow way. Keep paying for four separate
+    subscriptions that don't talk to each other. Wonder in six months why everyone
+    else moved past you.
+  </p>
+  <p style="max-width: 620px; margin-top: 18px;">
+    Or — click the button. Install the dashboard tonight. Wake up tomorrow with
+    Codex Goal Mode already running. Cancel anytime if it isn't for you. The
+    7-day refund means the worst outcome is you learned how the new stack works
+    and got your money back.
+  </p>
+  <p style="max-width: 620px; margin-top: 18px;">
+    <strong style="color: var(--cream);">The system runs whether you're inside it or not. The only question is whether <em style="font-family: 'Caveat', cursive; font-style: normal; color: var(--gold); font-size: 1.35em; line-height: 0.9;">you</em> are.</strong>
+  </p>
+  <a class="btn" href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" style="font-size: 1rem; padding: 18px 44px; margin-top: 24px;">Join the Boardroom →</a>
+  <div class="micro" style="margin-top: 20px;">7-day no-questions refund · 3,000+ members · Daily live calls · Cancel in 2 clicks</div>
+</div>
+
+<p style="text-align: center; font-size: 0.84rem; color: var(--cream-mute); margin-top: 40px;">
+  Built in Bangkok. Used daily by people across 38 countries.<br>
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none; border-bottom: 1px dotted var(--gold);">aiprofitboardroom.com</a>
+</p>
+
+</main>
+
+</body>
+</html>

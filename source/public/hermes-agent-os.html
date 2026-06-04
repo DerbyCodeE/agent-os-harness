@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hermes Agent OS — Take Your Dashboard Anywhere · Julian Goldie</title>
+<meta name="description" content="John Mesa built Julian Goldie's Agent OS on a Hostinger VPS, then locked it down with Cloudflare Tunnel + Cloudflare Access. Now he runs it from any device, anywhere. Plus 7 real questions from the Boardroom this week, answered." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:    #15101a;
+    --bg-mid:     #1c1622;
+    --bg-card:    #251d2c;
+    --bg-elev:    #2e2436;
+    --cream:      #f3ebda;
+    --cream-soft: #ddd0bb;
+    --cream-dim:  #a59783;
+    --cream-mute: #6e6353;
+    --gold:       #d4a574;
+    --gold-soft:  #e6c69a;
+    --gold-deep:  #a87f54;
+    --emerald:    #5ab896;
+    --plum:       #c4607e;
+    --rust:       #c97c5e;
+    --line:       rgba(212, 165, 116, 0.20);
+    --line-soft:  rgba(243, 235, 218, 0.08);
+    --shadow-1: 0 1px 0 rgba(243, 235, 218, 0.03), 0 8px 24px rgba(0,0,0,0.5);
+    --shadow-2: 0 2px 0 rgba(243, 235, 218, 0.04), 0 20px 60px rgba(0,0,0,0.55);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  a, a:link, a:visited, a:hover, a:active { color: inherit; text-decoration: none; }
+  body {
+    background: var(--bg-deep);
+    color: var(--cream);
+    font-family: 'Manrope', -apple-system, system-ui, sans-serif;
+    line-height: 1.65;
+    padding-top: 96px;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.9  0 0 0 0 0.85  0 0 0 0.035 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.55; mix-blend-mode: overlay;
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 65% 45% at 12% 6%, rgba(212, 165, 116, 0.09), transparent 60%),
+      radial-gradient(ellipse 55% 40% at 88% 22%, rgba(201, 124, 94, 0.07), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 50% 95%, rgba(196, 96, 126, 0.06), transparent 60%);
+  }
+  main, .sticky-banner, .progress-bar { position: relative; z-index: 2; }
+
+  /* Reading progress */
+  .progress-bar {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+    z-index: 1001; width: 0%; transition: width 0.1s linear;
+  }
+
+  /* BIG centered sticky banner — AI Profit Boardroom name must be unmistakable */
+  .sticky-banner {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, rgba(21, 16, 26, 0.98), rgba(21, 16, 26, 0.92));
+    backdrop-filter: blur(20px) saturate(140%);
+    border-bottom: 1px solid var(--line);
+    padding: 22px 28px;
+    display: flex; align-items: center; justify-content: center; gap: 28px;
+    text-align: center; flex-wrap: wrap;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .sticky-banner-left {
+    display: flex; align-items: center; gap: 16px;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.25rem; letter-spacing: -0.015em; color: var(--cream);
+  }
+  .sticky-banner .pulse-dot {
+    width: 12px; height: 12px; border-radius: 50%; background: var(--emerald);
+    box-shadow: 0 0 14px var(--emerald);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .sticky-banner .mark {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    color: var(--gold); font-size: 1.5rem;
+  }
+  .sticky-banner-cta {
+    background: linear-gradient(180deg, var(--gold), var(--gold-deep));
+    color: var(--bg-deep);
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700;
+    font-size: 0.92rem; letter-spacing: 0.04em;
+    padding: 12px 32px; border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(212, 165, 116, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .sticky-banner-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(212, 165, 116, 0.5); }
+
+  main { max-width: 880px; margin: 0 auto; padding: 0 32px 120px; }
+
+  /* Top nav */
+  .topnav {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    font-family: 'Manrope', sans-serif; font-size: 0.78rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--cream-mute);
+    margin-top: 28px; padding-bottom: 24px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .topnav a { color: var(--cream-mute); transition: color 0.2s; }
+  .topnav a.home { color: var(--cream-dim); }
+  .topnav a:hover { color: var(--gold); }
+  .topnav .sep { opacity: 0.4; }
+
+  /* Eyebrow chapter labels */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 14px;
+    margin-bottom: 18px; color: var(--cream-dim);
+  }
+  .eyebrow .num {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 1.6rem; color: var(--gold); line-height: 0.9;
+  }
+  .eyebrow .line { width: 36px; height: 1px; background: var(--gold); opacity: 0.6; }
+  .eyebrow .label {
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.72rem; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--cream-dim);
+  }
+
+  /* Section spacing + headings */
+  section { margin: 80px 0; }
+  h1 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: clamp(2.3rem, 5.5vw, 3.8rem);
+    letter-spacing: -0.028em;
+    line-height: 1.06; color: var(--cream); margin-bottom: 26px;
+  }
+  h1 em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.35em; line-height: 0.85;
+  }
+  h2 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: clamp(1.85rem, 4vw, 2.7rem);
+    letter-spacing: -0.022em;
+    line-height: 1.1; color: var(--cream); margin-bottom: 22px;
+  }
+  h2 em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.3em; line-height: 0.85;
+  }
+  h3 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.4rem; letter-spacing: -0.01em;
+    color: var(--cream); margin-bottom: 12px;
+  }
+  p { color: var(--cream-soft); font-size: 1.04rem; line-height: 1.7; margin-bottom: 18px; }
+  p.lead {
+    font-size: 1.22rem; color: var(--cream); line-height: 1.55;
+    margin-bottom: 28px; max-width: 64ch;
+  }
+  p strong, p b { color: var(--cream); font-weight: 600; }
+  p em { color: var(--cream); font-style: italic; }
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.92em;
+    background: rgba(212, 165, 116, 0.08); padding: 2px 6px; border-radius: 4px;
+    color: var(--gold-soft);
+  }
+
+  /* Latest badge */
+  .latest-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    margin-bottom: 22px;
+    padding: 8px 16px; border-radius: 999px;
+    background: rgba(196, 96, 126, 0.12);
+    border: 1px solid rgba(196, 96, 126, 0.45);
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #e69cb3;
+  }
+  .latest-badge .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--plum);
+    box-shadow: 0 0 12px var(--plum);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  /* Hero meta stats */
+  .meta-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px;
+    margin: 30px 0; padding: 22px 0;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  .meta-strip .item .label {
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--cream-mute); margin-bottom: 6px;
+  }
+  .meta-strip .item .value {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.18rem; color: var(--cream); line-height: 1;
+  }
+  .meta-strip .item .value em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.3em;
+  }
+
+  /* Images */
+  .hero-shot, .inline-shot {
+    position: relative;
+    margin: 36px 0 14px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-2);
+  }
+  .hero-shot img, .inline-shot img { display: block; width: 100%; height: auto; }
+  .shot-caption {
+    text-align: center;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.84rem; letter-spacing: 0.06em;
+    color: var(--cream-mute);
+    margin-bottom: 8px;
+  }
+  .shot-caption em {
+    font-family: 'Caveat', cursive; font-style: normal; color: var(--gold);
+    font-size: 1.25em;
+  }
+
+  /* Source quote */
+  .source-quote {
+    margin: 30px 0;
+    padding: 26px 28px;
+    border-left: 3px solid var(--gold);
+    background: linear-gradient(90deg, rgba(212, 165, 116, 0.08), transparent);
+    border-radius: 0 12px 12px 0;
+  }
+  .source-quote p:first-of-type {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 400;
+    font-size: 1.15rem; color: var(--cream); line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .source-quote p.source {
+    font-family: 'Manrope', sans-serif; font-size: 0.86rem;
+    color: var(--cream-dim); margin-bottom: 0;
+  }
+
+  /* Dividers */
+  .divider {
+    display: flex; align-items: center; gap: 18px;
+    margin: 64px 0;
+  }
+  .divider .rule { flex: 1; height: 1px; background: var(--line); max-width: 180px; }
+  .divider .ornament { font-family: 'Bricolage Grotesque', serif; color: var(--gold); font-size: 0.96rem; }
+
+  /* Framework pillars */
+  .pillars {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    margin: 30px 0 10px;
+  }
+  .pillar {
+    padding: 26px 24px;
+    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .pillar:hover {
+    border-color: var(--gold-soft);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(212, 165, 116, 0.15);
+  }
+  .pillar .num {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 2rem; color: var(--gold); line-height: 1;
+    margin-bottom: 8px;
+  }
+  .pillar h3 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.18rem; margin-bottom: 8px; color: var(--cream);
+  }
+  .pillar p { font-size: 0.96rem; line-height: 1.55; color: var(--cream-soft); margin: 0; }
+
+  /* Old vs New */
+  .vs-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+    margin: 30px 0 10px;
+  }
+  .way-box {
+    padding: 28px 26px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+  }
+  .way-box.old {
+    border-color: rgba(196, 96, 126, 0.32);
+    background: linear-gradient(180deg, rgba(196, 96, 126, 0.06), rgba(196, 96, 126, 0.015));
+  }
+  .way-box.new {
+    border-color: rgba(90, 184, 150, 0.32);
+    background: linear-gradient(180deg, rgba(90, 184, 150, 0.07), rgba(90, 184, 150, 0.015));
+  }
+  .way-box h4 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.05rem; margin-bottom: 12px; color: var(--cream);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .way-box .tag {
+    font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .way-box.old .tag { background: rgba(196, 96, 126, 0.18); color: #e69cb3; }
+  .way-box.new .tag { background: rgba(90, 184, 150, 0.18); color: var(--emerald); }
+  .way-box .time {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 1.5rem; color: var(--gold); margin-bottom: 14px;
+    display: block;
+  }
+  .way-box ul { list-style: none; padding: 0; }
+  .way-box li {
+    position: relative; padding-left: 24px; margin-bottom: 12px;
+    font-size: 0.97rem; line-height: 1.55; color: var(--cream-soft);
+  }
+  .way-box li::before {
+    position: absolute; left: 0; top: 0;
+    font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 0.95rem;
+  }
+  .way-box.old li::before { content: "✗"; color: #e69cb3; }
+  .way-box.new li::before { content: "✓"; color: var(--emerald); }
+
+  /* SOP steps */
+  .sop {
+    display: flex; flex-direction: column; gap: 14px;
+    margin: 30px 0 10px;
+  }
+  .sop-step {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    align-items: start;
+    padding: 22px 24px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+  }
+  .sop-step .num {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 2rem; color: var(--gold); line-height: 0.9;
+  }
+  .sop-step h4 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.1rem; color: var(--cream); margin-bottom: 6px;
+  }
+  .sop-step p {
+    font-size: 0.97rem; line-height: 1.55; color: var(--cream-soft);
+    margin: 0;
+  }
+
+  /* Section CTA — gold gradient pull card */
+  .section-cta {
+    display: block;
+    margin: 50px 0 14px;
+    padding: 36px 32px 32px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(212, 165, 116, 0.08), rgba(212, 165, 116, 0.02));
+    border: 1px solid var(--line);
+    text-align: center;
+    box-shadow: var(--shadow-1);
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s, background 0.25s;
+  }
+  .section-cta:hover {
+    border-color: var(--gold-soft);
+    box-shadow: 0 16px 44px rgba(212, 165, 116, 0.2), var(--shadow-1);
+    transform: translateY(-2px);
+    background: linear-gradient(180deg, rgba(212, 165, 116, 0.12), rgba(212, 165, 116, 0.04));
+  }
+  .section-cta .head {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.55rem; letter-spacing: -0.018em;
+    color: var(--cream); margin-bottom: 8px; line-height: 1.18;
+  }
+  .section-cta .head em {
+    font-family: 'Caveat', cursive; font-style: normal; font-weight: 500;
+    color: var(--gold); font-size: 1.35em;
+  }
+  .section-cta .sub {
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.94rem; line-height: 1.5; color: var(--cream-soft);
+    max-width: 480px; margin: 0 auto 22px;
+  }
+  .section-cta .pill {
+    display: inline-block;
+    background: var(--gold); color: var(--bg-deep);
+    font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 0.86rem; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 15px 36px; border-radius: 999px;
+    border: 1px solid var(--gold);
+  }
+  .section-cta .micro {
+    margin-top: 14px;
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--cream-mute);
+  }
+
+  /* Big AOS CTA Card with triangle image */
+  .aos-cta {
+    margin: 60px 0 30px;
+    padding: 48px 40px;
+    border-radius: 20px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(212, 165, 116, 0.18), transparent 70%),
+      var(--bg-card);
+    border: 2px solid var(--gold);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.6);
+  }
+  .aos-cta .triangle {
+    display: block;
+    max-width: 380px; width: 100%;
+    margin: 0 auto 22px;
+    border-radius: 12px;
+  }
+  .aos-cta h2 {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .aos-cta p.lead {
+    text-align: center;
+    margin: 0 auto 24px;
+    font-size: 1.1rem;
+  }
+  .aos-cta ul {
+    list-style: none; padding: 0;
+    max-width: 540px; margin: 0 auto 28px;
+  }
+  .aos-cta ul li {
+    position: relative; padding-left: 28px; margin-bottom: 10px;
+    font-size: 1rem; line-height: 1.55; color: var(--cream-soft);
+  }
+  .aos-cta ul li::before {
+    content: "✦"; position: absolute; left: 0; top: 2px;
+    color: var(--gold); font-size: 1rem;
+  }
+  .aos-cta ul li b { color: var(--gold); font-weight: 600; }
+  .aos-cta .center-btn {
+    text-align: center;
+  }
+  .aos-cta a.btn {
+    display: inline-block;
+    background: linear-gradient(180deg, var(--gold), var(--gold-deep));
+    color: var(--bg-deep);
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700;
+    font-size: 1.02rem; letter-spacing: 0.04em;
+    padding: 18px 42px; border-radius: 999px;
+    box-shadow: 0 14px 36px rgba(212, 165, 116, 0.42);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .aos-cta a.btn:hover { transform: translateY(-2px); }
+  .aos-cta .caveat-note {
+    text-align: center;
+    font-family: 'Caveat', cursive; font-weight: 500;
+    color: var(--gold); font-size: 1.4rem;
+    margin-top: 14px;
+  }
+
+  /* Beliefs */
+  .beliefs { display: flex; flex-direction: column; gap: 16px; margin: 30px 0 10px; }
+  .belief-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    padding: 22px 24px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+  }
+  .belief-row .wrong, .belief-row .right { display: flex; gap: 14px; }
+  .belief-row .wrong { color: var(--cream-dim); }
+  .belief-row .right { color: var(--cream); }
+  .belief-row .wrong .mark, .belief-row .right .mark {
+    flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .belief-row .wrong .mark { background: rgba(196, 96, 126, 0.18); color: var(--plum); }
+  .belief-row .right .mark { background: rgba(90, 184, 150, 0.18); color: var(--emerald); }
+  .belief-row .wrong p { font-style: italic; font-size: 0.97rem; margin: 0; color: var(--cream-dim); line-height: 1.5; }
+  .belief-row .right p { font-size: 0.97rem; margin: 0; color: var(--cream); font-weight: 500; line-height: 1.5; }
+
+  /* Testimonials callout (emerald) */
+  .testimonials-callout {
+    margin: 32px 0 10px;
+    padding: 28px 28px 26px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(90, 184, 150, 0.10), rgba(90, 184, 150, 0.02));
+    border: 1px solid rgba(90, 184, 150, 0.4);
+    text-align: center;
+  }
+  .testimonials-callout .t-tag {
+    font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--emerald); margin-bottom: 10px;
+  }
+  .testimonials-callout p {
+    color: var(--cream-soft); font-size: 1rem;
+    max-width: 540px; margin: 0 auto 18px;
+  }
+  .testimonials-callout .testimonials-btn {
+    display: inline-block;
+    background: rgba(90, 184, 150, 0.16);
+    border: 1px solid rgba(90, 184, 150, 0.6);
+    color: var(--cream);
+    font-family: 'Manrope', sans-serif; font-weight: 600;
+    font-size: 0.86rem; letter-spacing: 0.1em;
+    padding: 12px 26px; border-radius: 999px;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .testimonials-callout .testimonials-btn:hover {
+    background: rgba(90, 184, 150, 0.26); transform: translateY(-1px);
+  }
+
+  /* Q&A Cards */
+  .qa-card {
+    margin: 26px 0;
+    padding: 26px 28px;
+    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-1);
+  }
+  .qa-card .qa-head {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--line-soft);
+    padding-bottom: 14px;
+  }
+  .qa-card .qa-num {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 1.6rem; color: var(--gold); line-height: 0.9;
+    flex-shrink: 0;
+  }
+  .qa-card .qa-meta {
+    flex: 1;
+  }
+  .qa-card .qa-from {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 1.06rem; color: var(--cream); line-height: 1.2;
+  }
+  .qa-card .qa-link {
+    font-family: 'Manrope', sans-serif; font-weight: 500;
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--cream-mute); margin-top: 4px; display: block;
+    transition: color 0.2s;
+  }
+  .qa-card .qa-link:hover { color: var(--gold); }
+  .qa-card .qa-shot {
+    margin: 0 0 18px;
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--line-soft);
+  }
+  .qa-card .qa-shot img { display: block; width: 100%; height: auto; }
+  .qa-card .qa-quote {
+    font-family: 'Manrope', sans-serif; font-style: italic; font-weight: 500;
+    font-size: 0.98rem; line-height: 1.55; color: var(--cream-dim);
+    margin: 16px 0 18px;
+    padding: 12px 18px;
+    border-left: 2px solid var(--gold);
+    background: rgba(212, 165, 116, 0.04);
+    border-radius: 0 8px 8px 0;
+  }
+  .qa-card .qa-answer-tag {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 1.5rem; color: var(--gold); margin-bottom: 6px;
+    display: block;
+  }
+  .qa-card .qa-answer p {
+    font-size: 1rem; line-height: 1.65; color: var(--cream-soft);
+    margin-bottom: 12px;
+  }
+
+  /* Recap grid */
+  .recap-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    margin: 30px 0;
+  }
+  .recap-tile {
+    padding: 22px 18px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    text-align: center;
+  }
+  .recap-tile .icon {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    color: var(--gold); font-size: 1.7rem;
+    line-height: 1;
+  }
+  .recap-tile h4 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: 0.96rem; color: var(--cream);
+    margin: 8px 0 6px;
+  }
+  .recap-tile p {
+    font-size: 0.82rem; color: var(--cream-mute); line-height: 1.45;
+    margin: 0;
+  }
+
+  /* Tagline band */
+  .tagline-band {
+    margin: 80px -32px 30px;
+    padding: 50px 32px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(212, 165, 116, 0.08), rgba(196, 96, 126, 0.04));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .tagline-band .promise {
+    font-family: 'Caveat', cursive; font-weight: 500;
+    font-size: 2rem; color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .tagline-band p {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 500;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    color: var(--cream); letter-spacing: -0.018em; line-height: 1.2;
+    margin: 0; max-width: 720px; margin-inline: auto;
+  }
+  .tagline-band p em {
+    font-family: 'Caveat', cursive; font-style: normal; color: var(--gold);
+    font-size: 1.25em;
+  }
+
+  /* Final close */
+  .final-close {
+    margin: 80px 0 40px;
+    padding: 70px 40px;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(212, 165, 116, 0.15), transparent 60%),
+      var(--bg-card);
+    border: 1px solid var(--gold);
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: var(--shadow-2);
+  }
+  .final-close .signoff {
+    font-family: 'Caveat', cursive; color: var(--gold); font-size: 1.7rem;
+    margin-bottom: 14px;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line-soft);
+    text-align: center;
+    font-size: 0.86rem;
+    color: var(--cream-mute);
+  }
+  .footer a { color: var(--gold); border-bottom: 1px dotted var(--gold); }
+
+  @media (max-width: 720px) {
+    body { padding-top: 132px; }
+    .sticky-banner { padding: 14px 16px; gap: 14px; }
+    .sticky-banner-left { font-size: 1rem; gap: 10px; }
+    .sticky-banner .mark { font-size: 1.2rem; }
+    .sticky-banner-cta { padding: 10px 22px; font-size: 0.84rem; }
+    main { padding: 0 18px 80px; }
+    section { margin: 60px 0; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.55rem; }
+    .meta-strip { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .pillars, .vs-grid { grid-template-columns: 1fr; }
+    .belief-row { grid-template-columns: 1fr; }
+    .recap-grid { grid-template-columns: repeat(2, 1fr); }
+    .aos-cta { padding: 32px 22px; }
+    .final-close { padding: 40px 22px; }
+    .qa-card { padding: 20px 18px; }
+    .tagline-band { margin: 60px -18px 20px; padding: 40px 18px; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Reading progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Sticky banner -->
+<div class="sticky-banner">
+  <div class="sticky-banner-left">
+    <span class="pulse-dot"></span>
+    <span>The full <span class="mark">Hermes + Agent OS</span> setup lives inside the AI Profit Boardroom</span>
+  </div>
+  <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="sticky-banner-cta">Join AIPB →</a>
+</div>
+
+<main>
+
+  <!-- Top nav -->
+  <div class="topnav">
+    <a href="/" class="home">← All guides</a>
+    <span class="sep">·</span>
+    <a href="/mythos">Claude Mythos</a>
+    <span class="sep">·</span>
+    <a href="/agent-os-system.html">Agent OS</a>
+    <span class="sep">·</span>
+    <a href="/obsidian">Second Brain</a>
+    <span class="sep">·</span>
+    <a href="/codex">Goal Engine</a>
+    <span class="sep">·</span>
+    <a href="/testimonials">Testimonials</a>
+  </div>
+
+  <!-- ============ I — HERO ============ -->
+  <section style="margin-top: 48px;">
+    <div class="latest-badge">
+      <span class="dot"></span>
+      <span>New framework — Hermes Agent OS</span>
+    </div>
+
+    <div class="eyebrow">
+      <span class="num">I.</span>
+      <span class="line"></span>
+      <span class="label">The Hermes Stack</span>
+    </div>
+
+    <h1>The Goldie <em>Hermes Stack</em>™ + Agent OS.</h1>
+
+    <p class="lead">
+      My new framework — built on Agent OS, the dashboard you've seen in every other guide.
+      Same seven agents. Same one-screen view. One twist — it doesn't live on your laptop any more.
+      It lives on a VPS, behind a Cloudflare tunnel, locked down by Cloudflare Access.
+      You open it on your phone in a hotel. You open it on a borrowed desktop in another state.
+      The dashboard follows you. Hermes is the messenger god. This is your messenger.
+    </p>
+
+    <p>
+      A Boardroom member, John Mesa, just shipped this exact setup.
+      He works across three US states — New York, New Jersey and Miami.
+      Multiple office desktops. A laptop. He could not run Agent OS local-only.
+      So he put it on a Hostinger VPS. Then he wrapped it in Cloudflare Tunnel + Cloudflare Access.
+      Now he opens it from any device, anywhere.
+      19 likes. 65 comments. The room is asking how he did it.
+      This guide is the how.
+    </p>
+
+    <div class="meta-strip">
+      <div class="item"><div class="label">Devices</div><div class="value"><em>Any</em></div></div>
+      <div class="item"><div class="label">States covered</div><div class="value"><em>3</em>+ &nbsp;(NY, NJ, FL)</div></div>
+      <div class="item"><div class="label">Cost to run</div><div class="value">~$5<em>/mo</em> VPS</div></div>
+      <div class="item"><div class="label">Set up in</div><div class="value">~<em>90</em> min</div></div>
+    </div>
+
+    <div class="hero-shot">
+      <img src="/images/hermes-agent-os/image1.png" alt="John Mesa's Agent OS running on a VPS — mobile + desktop side-by-side" loading="eager">
+    </div>
+    <div class="shot-caption">John Mesa · <em>Mobile</em> + Desktop · Same dashboard, same login, same workspace</div>
+
+    <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+      <div class="head">Want this <em>exact</em> Hermes setup?</div>
+      <div class="sub">Members get the install + the source + the Cloudflare config walked through live</div>
+      <span class="pill">Join AIPB →</span>
+      <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+    </a>
+  </section>
+
+  <div class="divider"><span class="rule"></span><span class="ornament">✦</span><span class="rule"></span></div>
+
+  <!-- ============ II — THE POST ============ -->
+  <section>
+    <div class="eyebrow">
+      <span class="num">II.</span>
+      <span class="line"></span>
+      <span class="label">The win, in his own words</span>
+    </div>
+
+    <h2>John Mesa, on Skool, this week.</h2>
+
+    <div class="source-quote">
+      <p>"I just finished building Agent OS from Julian Goldie's blueprint, but with one important twist. Because I work across three different states in the US — New York, New Jersey and Miami — and therefore multiple office desktop computers plus my laptop, I could not rely on a local-only setup. I needed something secure, mobile, and accessible from anywhere. So I deployed it on my Hostinger VPS and secured it behind Cloudflare Tunnel and Cloudflare Access. Now I can use it from any device, whether I am at home, at work, or travelling."</p>
+      <p class="source">— John Mesa, AI Profit Boardroom · <a href="https://www.skool.com/ai-profit-lab-7462/i-just-built-julians-agent-os-on-vps-for-desktop-and-mobile-access" target="_blank" rel="noopener" style="color: var(--gold); border-bottom: 1px dotted var(--gold);">read the original Skool post →</a></p>
+    </div>
+
+    <p>
+      That last sentence is the whole guide.
+      "From any device, whether I am at home, at work, or travelling."
+      That sentence is not in any of the Agent OS marketing.
+      It's not in the install pack.
+      It's what John added on top.
+      And once you see it working, you cannot go back.
+    </p>
+  </section>
+
+  <div class="divider"><span class="rule"></span><span class="ornament">✦</span><span class="rule"></span></div>
+
+  <!-- ============ III — WHY THIS MATTERS ============ -->
+  <section>
+    <div class="eyebrow">
+      <span class="num">III.</span>
+      <span class="line"></span>
+      <span class="label">Why this matters</span>
+    </div>
+
+    <h2>If your work spans <em>more than one</em> machine, you need this.</h2>
+
+    <p>
+      Most Agent OS setups run on one laptop.
+      That works if you sit at the same desk every day.
+      It does not work if you have three offices.
+      It does not work if you travel.
+      It does not work if you switch between a desktop and a laptop and a phone.
+    </p>
+
+    <p>
+      The standard fix is to leave your laptop on at home, then VPN in.
+      That works until your power goes out.
+      Or your dog steps on the cable.
+      Or your roommate restarts the router.
+      You're now 1,200 miles away with no dashboard.
+    </p>
+
+    <p>
+      John's fix takes that risk to zero.
+      The VPS is always on. The tunnel is always up. Cloudflare Access checks who you are before the dashboard even loads.
+      No port forwarding. No public IP. No "is my laptop awake right now" guesswork.
+    </p>
+
+    <p>
+      This pattern is for anyone who runs their business out of more than one room.
+      Agency owners with clients on Zoom calls from cafés.
+      Ecommerce founders managing inventory from a hotel.
+      Realtors with three offices.
+      Anyone whose work moves.
+    </p>
+  </section>
+
+  <div class="divider"><span class="rule"></span><span class="ornament">✦</span><span class="rule"></span></div>
+
+  <!-- ============ IV — THE FRAMEWORK ============ -->
+  <section>
+    <div class="eyebrow">
+      <span class="num">IV.</span>
+      <span class="line"></span>
+      <span class="label">The Goldie Hermes Stack™</span>
+    </div>
+
+    <h2>Four layers. <em>One</em> dashboard. Open from anywhere.</h2>
+
+    <p class="lead">
+      The Hermes Stack is what John built.
+      Each layer is one job.
+      Each job is replaceable.
+      Together they turn a local dashboard into one you can open from any device.
+    </p>
+
+    <div class="pillars">
+      <div class="pillar">
+        <div class="num">i.</div>
+        <h3>The Engine — Hostinger VPS</h3>
+        <p>A small Linux box. Always on. Costs about $5 a month. Runs Agent OS the same way your laptop did, just on someone else's hardware.</p>
+      </div>
+      <div class="pillar">
+        <div class="num">ii.</div>
+        <h3>The Bridge — Cloudflare Tunnel</h3>
+        <p>A free, encrypted pipe from Cloudflare's network straight into your VPS. No public ports. No firewall holes. No IP address to leak.</p>
+      </div>
+      <div class="pillar">
+        <div class="num">iii.</div>
+        <h3>The Gate — Cloudflare Access</h3>
+        <p>The login screen in front of your dashboard. One-time codes to your email. Or Google. Or GitHub. You decide who gets in.</p>
+      </div>
+      <div class="pillar">
+        <div class="num">iv.</div>
+        <h3>The Cockpit — Agent OS</h3>
+        <p>The same dashboard you already know. Claude, OpenClaw, Hermes, Codex, Free Claude Code, Antigravity, Gemini. Same screen, now on the VPS.</p>
+      </div>
+    </div>
+
+    <p style="margin-top: 30px;">
+      Hermes is the Greek messenger god.
+      He carries information between worlds.
+      That's what this stack does.
+      It carries your dashboard between your devices.
+    </p>
+
+    <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+      <div class="head">The <em>full</em> Hermes Stack walk-through is in the Boardroom</div>
+      <div class="sub">commands, config files, and live calls where members copy the setup</div>
+      <span class="pill">Join AIPB →</span>
+      <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+    </a>
+  </section>
+
+  <div class="divider"><span class="rule"></span><span class="ornament">✦</span><span class="rule"></span></div>
+
+  <!-- ============ V — OLD vs NEW ============ -->
+  <section>
+    <div class="eyebrow">
+      <span class="num">V.</span>
+      <span class="line"></span>
+      <span class="label">The shift</span>
+    </div>
+
+    <h2>Local-only vs <em>Hermes Stack</em>.</h2>
+
+    <div class="vs-grid">
+      <div class="way-box old">
+        <h4><span class="tag">Old way</span> Local laptop only</h4>
+        <span class="time">~tied to one chair</span>
+        <ul>
+          <li>Dashboard runs on the laptop in your kitchen</li>
+          <li>Phone shows nothing. iPad shows nothing. Office desktop shows nothing.</li>
+          <li>Sleep the laptop and Codex Goal Mode stops mid-run</li>
+          <li>Travel for a week and you come back to half-finished tasks</li>
+          <li>If the laptop dies, the whole dashboard dies with it</li>
+          <li>VPN solutions break the first time the router restarts</li>
+        </ul>
+      </div>
+      <div class="way-box new">
+        <h4><span class="tag">New way</span> Hermes Stack</h4>
+        <span class="time">~any device, anywhere</span>
+        <ul>
+          <li>Dashboard lives on the VPS — always on, always reachable</li>
+          <li>Phone, iPad, three office desktops, hotel laptop — all see the same thing</li>
+          <li>Codex Goal Mode runs while you sleep, fly, drive, or close every device</li>
+          <li>Cloudflare Access checks your identity before the page even loads</li>
+          <li>Lose your laptop? Buy a new one. Log in. Everything is exactly where you left it.</li>
+          <li>Free Cloudflare plan + ~$5/mo VPS = total monthly cost lower than one Claude session</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><span class="rule"></span><span class="ornament">✦</span><span class="rule"></span></div>
+
+  <!-- ============ VI — SOP ============ -->
+  <section>
+    <div class="eyebrow">
+      <span class="num">VI.</span>
+      <span class="line"></span>
+      <span class="label">How John did it</span>
+    </div>
+
+    <h2>The 8-step setup. <em>Plain</em> English.</h2>
+
+    <p class="lead">
+      You don't need to be technical.
+      You need to be patient for 90 minutes.
+      Most members get through this on a Sunday morning with a coffee.
+    </p>
+
+    <div class="sop">
+      <div class="sop-step"><div class="num">1.</div><div>
+        <h4>Get a Hostinger VPS</h4>
+        <p>Pick the smallest plan. Linux Ubuntu. About $5 a month. Hostinger gives you root access, a public IP, and a 1-click web terminal. That's all you need.</p>
+      </div></div>
+      <div class="sop-step"><div class="num">2.</div><div>
+        <h4>Install Node + the basics</h4>
+        <p>One command — <code>apt install nodejs git curl</code>. You're getting the same Node 20 the laptop install uses. Plus a few system tools.</p>
+      </div></div>
+      <div class="sop-step"><div class="num">3.</div><div>
+        <h4>Upload the Agent OS source</h4>
+        <p>Open the agent-os-pack.zip. Drag the <code>source/</code> folder onto the VPS via SFTP. No GitHub, no clone — just the files you already have.</p>
+      </div></div>
+      <div class="sop-step"><div class="num">4.</div><div>
+        <h4>Run <code>npm install</code> then <code>npm run dev</code></h4>
+        <p>Same two commands as on a laptop. The dashboard now runs on the VPS at port 3737. You can't see it yet — Cloudflare fixes that next.</p>
+      </div></div>
+      <div class="sop-step"><div class="num">5.</div><div>
+        <h4>Install <code>cloudflared</code> + create a tunnel</h4>
+        <p>One install. One <code>cloudflared tunnel create hermes</code>. Cloudflare gives you a token. You drop it into a config file. The pipe is open.</p>
+      </div></div>
+      <div class="sop-step"><div class="num">6.</div><div>
+        <h4>Point a subdomain at the tunnel</h4>
+        <p>In Cloudflare DNS, add a CNAME like <code>dash.yourdomain.com</code> pointing at the tunnel. Cloudflare handles HTTPS for free.</p>
+      </div></div>
+      <div class="sop-step"><div class="num">7.</div><div>
+        <h4>Turn on Cloudflare Access</h4>
+        <p>In Cloudflare Zero Trust, create an Access policy for <code>dash.yourdomain.com</code>. Allow only your email. Cloudflare sends a one-time code on every login. The dashboard now requires it.</p>
+      </div></div>
+      <div class="sop-step"><div class="num">8.</div><div>
+        <h4>Run it as a service so it never sleeps</h4>
+        <p>Use <code>pm2</code> or a tiny systemd unit. The dashboard now starts on boot, restarts on crash, and runs forever. You close every laptop. It keeps going.</p>
+      </div></div>
+    </div>
+
+    <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+      <div class="head">Want the <em>exact</em> commands + config files?</div>
+      <div class="sub">members get the full 8-step walk-through with screenshots of every screen, plus a live setup call if you get stuck</div>
+      <span class="pill">Get the walk-through →</span>
+      <div class="micro">3,000+ members · 7-day refund · cancel anytime</div>
+    </a>
+  </section>
+
+  <div class="divider"><span class="rule"></span><span class="ornament">✦</span><span class="rule"></span></div>
+
+  <!-- ============ VII — BIG CTA #1 (60% mark) ============ -->
+  <section id="join">
+    <div class="aos-cta">
+      <img src="/images/hermes-agent-os/openclaw-agent-os.png" class="triangle" alt="Agent OS — Claude, OpenClaw, Hermes all wired together">
+
+      <h2>Get the <em>full</em> Agent OS — the same one John runs on his VPS.</h2>
+
+      <p class="lead">
+        Members of the AI Profit Boardroom get the full Hermes Stack — the dashboard, the VPS guide, the Cloudflare Tunnel config, the Access policy template — plus daily live rooms where we set it up together step by step.
+      </p>
+
+      <ul>
+        <li>The full <b>Agent OS source code</b> — the same dashboard John deployed</li>
+        <li>The <b>Hermes Stack VPS guide</b> — 8 steps, screenshots, no guessing</li>
+        <li><b>Cloudflare Tunnel + Access</b> templates, ready to paste in</li>
+        <li><b>Daily live rooms</b> — get stuck, drop in, we set it up with you</li>
+        <li>A <b>30-day Agent OS roadmap</b> — week one install, week four production</li>
+        <li>The full <b>prompt library</b> — every Hermes / Claude / Codex prompt I run</li>
+        <li>A <b>member map</b> — see other Boardroom members in your city</li>
+        <li><b>Lifetime updates</b> — every new framework I ship, you get the same week</li>
+      </ul>
+
+      <div class="center-btn">
+        <a class="btn" href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener">Join the AI Profit Boardroom →</a>
+        <div class="caveat-note">$59 / month · 7-day refund · cancel any time ✨</div>
+      </div>
+    </div>
+
+    <div class="testimonials-callout">
+      <div class="t-tag">Don't take my word for it</div>
+      <p>158 pages of members who've already built the system, kept it running, and shipped real businesses on top of it. Real screenshots, real numbers, real names.</p>
+      <a href="https://docs.google.com/document/d/1dpdMktIMiJTsOCf_Jb4kFLQfr3uMXX0RHUR9Bub0dU8/edit?tab=t.0" target="_blank" rel="noopener" class="testimonials-btn">Read the 158-page testimonials doc →</a>
+    </div>
+  </section>
+
+  <div class="divider"><span class="rule"></span><span class="ornament">✦</span><span class="rule"></span></div>
+
+  <!-- ============ VIII — BELIEFS ============ -->
+  <section>
+    <div class="eyebrow">
+      <span class="num">VIII.</span>
+      <span class="line"></span>
+      <span class="label">The voice in your head</span>
+    </div>
+
+    <h2>Three things that will <em>stop</em> you setting this up.</h2>
+
+    <p class="lead">
+      Every member who's done the Hermes Stack ran into one of these three thoughts.
+      They all got past it.
+      Here's how.
+    </p>
+
+    <div class="beliefs">
+
+      <div class="belief-row">
+        <div class="wrong">
+          <span class="mark">✗</span>
+          <p>"I'm not technical. A VPS sounds like a developer thing. I'll break it."</p>
+        </div>
+        <div class="right">
+          <span class="mark">✓</span>
+          <p>Hostinger's web terminal is the same as opening Notes. Eight commands. You can't break anything that <code>apt reinstall</code> doesn't fix in 60 seconds. John isn't a developer — he's a Boardroom member who reads the same install guide you'll get.</p>
+        </div>
+      </div>
+
+      <div class="belief-row">
+        <div class="wrong">
+          <span class="mark">✗</span>
+          <p>"Cloudflare Tunnel + Access — that's enterprise stuff. Way too much for me."</p>
+        </div>
+        <div class="right">
+          <span class="mark">✓</span>
+          <p>Both are free on the Cloudflare free plan. Tunnel is one binary. Access is one dropdown — "allow only my email." Big companies use it because it's good. Solo operators use it because it's easy.</p>
+        </div>
+      </div>
+
+      <div class="belief-row">
+        <div class="wrong">
+          <span class="mark">✗</span>
+          <p>"I'll set this up once and then it'll break and I won't know how to fix it."</p>
+        </div>
+        <div class="right">
+          <span class="mark">✓</span>
+          <p>You have a room of 3,000 members who've run the same install. One Skool message and someone walks you through. Plus daily live rooms. The cost of getting stuck is one DM.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <p style="margin-top: 30px;">
+      The people who figure out AI agents now, while the tools are evolving fast, are going to be way ahead when everything settles.
+      Every workflow you build. Every system you wire up. Every problem you solve.
+      It all compounds.
+    </p>
+
+    <div class="testimonials-callout">
+      <div class="t-tag">Real evidence the beliefs are wrong</div>
+      <p>158 pages of members who already broke through these exact thoughts. The wins they shipped are documented in their own words.</p>
+      <a href="https://docs.google.com/document/d/1dpdMktIMiJTsOCf_Jb4kFLQfr3uMXX0RHUR9Bub0dU8/edit?tab=t.0" target="_blank" rel="noopener" class="testimonials-btn">Read the 158-page testimonials doc →</a>
+    </div>
+  </section>
+
+  <div class="divider"><span class="rule"></span><span class="ornament">✦</span><span class="rule"></span></div>
+
+  <!-- ============ IX — THE Q&A (SOCRATIC SOCIETY) ============ -->
+  <section>
+    <div class="eyebrow">
+      <span class="num">IX.</span>
+      <span class="line"></span>
+      <span class="label">The Socratic Society — this week</span>
+    </div>
+
+    <h2>Seven <em>real</em> questions from the room.</h2>
+
+    <p class="lead">
+      The AI Profit Boardroom isn't me talking and members listening.
+      It's a room of equals — builders, agency owners, creators, operators.
+      Everyone brings problems AND insights.
+      I weigh in too, but as one voice in the room, not the final word.
+      One person asks. Everyone learns.
+    </p>
+
+    <p>
+      Here are seven of the most interesting questions posted this week.
+      Each one is a real Boardroom post.
+      Each answer is mine — short, direct, what I'd say in the live room.
+    </p>
+
+    <!-- Q1 — Rachad -->
+    <div class="qa-card">
+      <div class="qa-head">
+        <span class="qa-num">Q1.</span>
+        <div class="qa-meta">
+          <div class="qa-from">Rachad El-houssami — Newbie here, ecommerce stack</div>
+          <a href="https://www.skool.com/ai-profit-lab-7462/newbie-here-69bb5f52" target="_blank" rel="noopener" class="qa-link">read on Skool →</a>
+        </div>
+      </div>
+      <div class="qa-shot"><img src="/images/hermes-agent-os/image7.png" alt="Rachad's post — newbie, ecommerce stores, wants to automate research, product pages, image + video"></div>
+      <div class="qa-quote">"I own and operate ecommerce stores. I want to automate research, product page building in Shopify, image generation, video generation and editing. I use HyperFrames + Freepik + SEEDANCE 2.0 for videos. I use either OpenAI API or Google Studio for images."</div>
+      <span class="qa-answer-tag">My answer —</span>
+      <div class="qa-answer">
+        <p>You're already running the right pieces. You just don't have a dashboard tying them together yet. That's what Agent OS gives you. One screen. Three agents wired in for three jobs.</p>
+        <p>Put <strong>OpenClaw</strong> on research. Competitor scrape, market sizing, supplier hunting.</p>
+        <p>Put <strong>Claude</strong> on Shopify. Product page copy, descriptions, alt tags, schema.</p>
+        <p>Put <strong>Hermes</strong> on creative. HyperFrames for video, Freepik for stills, SEEDANCE for the longer cuts.</p>
+        <p>Stop tab-switching. Stop copy-pasting. The agents share memory inside the dashboard, so the product Claude writes about is the same product OpenClaw researched. You don't re-paste anything.</p>
+      </div>
+    </div>
+
+    <!-- Q2 — Michael Proch -->
+    <div class="qa-card">
+      <div class="qa-head">
+        <span class="qa-num">Q2.</span>
+        <div class="qa-meta">
+          <div class="qa-from">Michael Proch — Real estate. One Hermes or many?</div>
+          <a href="https://www.skool.com/ai-profit-lab-7462/excited-to-learn-from-the-group" target="_blank" rel="noopener" class="qa-link">read on Skool →</a>
+        </div>
+      </div>
+      <div class="qa-shot"><img src="/images/hermes-agent-os/image8.png" alt="Michael's post — real estate, wants Hermes for VA + TC, marketing, SEO"></div>
+      <div class="qa-quote">"My short term goal is to train a Hermes agent to be my real estate teams' VA and TC. Then build out a marketing team for content and posting. Lastly work on SEO. Not sure if I should be using one Hermes agent to do these different tasks or if I need to setup separate Hermes agents."</div>
+      <span class="qa-answer-tag">My answer —</span>
+      <div class="qa-answer">
+        <p>Separate. One Hermes per role. Always.</p>
+        <p>Make a <strong>VA-Hermes</strong> with the inbox, calendar, and listing-prep tools.</p>
+        <p>Make a <strong>TC-Hermes</strong> with the closing checklists, the contract templates, and the deadline tracker.</p>
+        <p>Make a <strong>Content-Hermes</strong> with the brand voice, the posting calendar, and the Buffer wiring.</p>
+        <p>Make an <strong>SEO-Hermes</strong> with the keyword tracking, the GSC connection, and the post-publishing checklist.</p>
+        <p>Each one gets its own system prompt, its own memory, its own tools. Each one shows up as its own tab in your Agent OS dashboard. Agents drift when the role is too broad — one agent doing four jobs is one agent forgetting three of them.</p>
+      </div>
+    </div>
+
+    <!-- Q3 — Ziyad -->
+    <div class="qa-card">
+      <div class="qa-head">
+        <span class="qa-num">Q3.</span>
+        <div class="qa-meta">
+          <div class="qa-from">Ziyad Serroukh — Hermes + Grok or ChatGPT?</div>
+          <a href="https://www.skool.com/ai-profit-lab-7462/which-one-is-better" target="_blank" rel="noopener" class="qa-link">read on Skool →</a>
+        </div>
+      </div>
+      <div class="qa-shot"><img src="/images/hermes-agent-os/image6.png" alt="Ziyad's post — which one is better, Hermes with Grok or ChatGPT"></div>
+      <div class="qa-quote">"I wanted to ask what you guys think is better — Hermes agent with Grok or ChatGPT."</div>
+      <span class="qa-answer-tag">My answer —</span>
+      <div class="qa-answer">
+        <p>Both.</p>
+        <p>Use <strong>Grok-4</strong> for the live-web research. It's wired into X, so it sees what's happening today, not last quarter.</p>
+        <p>Use <strong>ChatGPT</strong> for the structured outputs. Long reasoning chains, JSON, document drafting.</p>
+        <p>The point of running Hermes inside Agent OS is that swapping the underlying model is two clicks. You're not committing for life. You're picking the right brain for the specific task.</p>
+        <p>Run the same prompt through both. Keep the answer you like. Move on. The cost of switching is zero, so stop trying to pick one.</p>
+      </div>
+    </div>
+
+    <!-- Q4 — Tnt Tnt -->
+    <div class="qa-card">
+      <div class="qa-head">
+        <span class="qa-num">Q4.</span>
+        <div class="qa-meta">
+          <div class="qa-from">Tnt Tnt — Onboarding Hermes. Venice or Nous?</div>
+          <a href="https://www.skool.com/ai-profit-lab-7462/onboarding-hermes-venice-vs-nous-chat" target="_blank" rel="noopener" class="qa-link">read on Skool →</a>
+        </div>
+      </div>
+      <div class="qa-shot"><img src="/images/hermes-agent-os/image4.png" alt="Tnt's post — used OpenClaw + Claude for 4 months, big Claude usage, considering Hermes via Venice or Nous"></div>
+      <div class="qa-quote">"I've been using OC + Claude for one of my businesses for the past 4 months now. Building workflows, reasoning for complex tasks have been on point — of course it comes with a huge cost from Claude extra usage. I'm ready to give Hermes a shot. I was wondering if anyone has any experience with Venice or Nous subscription with Hermes."</div>
+      <span class="qa-answer-tag">My answer —</span>
+      <div class="qa-answer">
+        <p>Nous. Every time.</p>
+        <p>Venice is fine for a privacy-first chat. But Nous is where Hermes was born. Better tool use. Better memory. Lower latency. And it's the model the rest of the Boardroom is running, so when you ask a question in the live room, the answer is wired to the same stack.</p>
+        <p>On the timeouts and variety errors you're seeing — those are usually <strong>Claude rate-limit ceilings</strong>, not bad prompts. The fix isn't a better prompt. The fix is a second engine that takes load off Claude.</p>
+        <p>Hermes via Nous is that relief valve. Same dashboard. Different model under the hood. When Claude is choking, you click the Hermes tab and keep working.</p>
+      </div>
+    </div>
+
+    <!-- Q5 — Olga -->
+    <div class="qa-card">
+      <div class="qa-head">
+        <span class="qa-num">Q5.</span>
+        <div class="qa-meta">
+          <div class="qa-from">Olga Ko — Codex in the browser. Cloud or not?</div>
+          <a href="https://www.skool.com/ai-profit-lab-7462/codex-in-browser" target="_blank" rel="noopener" class="qa-link">read on Skool →</a>
+        </div>
+      </div>
+      <div class="qa-shot"><img src="/images/hermes-agent-os/image5.png" alt="Olga's post — confused about whether Codex runs in the cloud or requires the app"></div>
+      <div class="qa-quote">"I'm not very comfortable having Codex want access to my network. OpenAI supposedly has Codex in the cloud — but if I go to chatgpt.com/codex/cloud it asks me to download the app. Means it's not in the cloud? I'm confused."</div>
+      <span class="qa-answer-tag">My answer —</span>
+      <div class="qa-answer">
+        <p>It IS in the cloud. The cloud UI is real. The page is just gated.</p>
+        <p>The cloud version of Codex only unlocks for <strong>ChatGPT Pro, Team, or Enterprise</strong> tiers. If you're on Plus, the page redirects you to install the app — which is what you saw.</p>
+        <p>Two paths from here.</p>
+        <p><strong>Path A:</strong> upgrade your ChatGPT tier. Then chatgpt.com/codex/cloud opens up. Tasks run in isolated cloud sandboxes. No agent on your network.</p>
+        <p><strong>Path B:</strong> what John Mesa just did. Put Agent OS on a VPS. Run Codex inside it. The agent lives on the VPS, not on your office network. Same outcome — Codex never touches your local machine.</p>
+        <p>Both are clean. Path B costs $5 a month. Path A costs more but you don't have to set anything up.</p>
+      </div>
+    </div>
+
+    <!-- Q6 — Sachi -->
+    <div class="qa-card">
+      <div class="qa-head">
+        <span class="qa-num">Q6.</span>
+        <div class="qa-meta">
+          <div class="qa-from">Sachi Lord — YouTube thumbnail skill?</div>
+          <a href="https://www.skool.com/ai-profit-lab-7462/youtube-thumbnail-skill" target="_blank" rel="noopener" class="qa-link">read on Skool →</a>
+        </div>
+      </div>
+      <div class="qa-shot"><img src="/images/hermes-agent-os/image3.png" alt="Sachi's post — looking for a YouTube thumbnail skill that looks at competitors and generates 20 variations"></div>
+      <div class="qa-quote">"Does anyone have a YouTube Thumbnail creation skill they're willing to share? Something that looks at competitor thumbnails on similar topics, sees which videos are doing well, creates 20 variations of it."</div>
+      <span class="qa-answer-tag">My answer —</span>
+      <div class="qa-answer">
+        <p>Yes. This is a Hermes + Studio combo skill. I'll drop it in the Boardroom this week, but the shape is this:</p>
+        <p><strong>Step 1 — Scrape.</strong> Hermes uses the YouTube Data API. Pass in a topic. It pulls the top 50 videos by view count from the last 90 days. Gets every thumbnail URL, view count, channel, age, title.</p>
+        <p><strong>Step 2 — Score.</strong> Hermes ranks them by views-per-day, not just total views. New videos with high velocity beat old videos with stale view counts.</p>
+        <p><strong>Step 3 — Style-extract.</strong> Pass the top 5 thumbnails to gpt-image-2. Ask it to describe the visual style — colours, composition, expression, text placement.</p>
+        <p><strong>Step 4 — Generate.</strong> Studio (the Hermes image agent) creates 20 variations of YOUR thumbnail in the extracted style. Same face, same headline — 20 different compositions.</p>
+        <p>Then you pick one. The whole loop runs inside Agent OS in about 4 minutes.</p>
+      </div>
+    </div>
+
+    <!-- Q7 — Jerry -->
+    <div class="qa-card">
+      <div class="qa-head">
+        <span class="qa-num">Q7.</span>
+        <div class="qa-meta">
+          <div class="qa-from">Jerry Polson — Hooked on Hermes (a win, not a question)</div>
+          <a href="https://www.skool.com/ai-profit-lab-7462/ok-i-am-hooked-on-hermes" target="_blank" rel="noopener" class="qa-link">read on Skool →</a>
+        </div>
+      </div>
+      <div class="qa-shot"><img src="/images/hermes-agent-os/image2.png" alt="Jerry's post — Hermes pulls voice recordings from Pocket AI every 4 hours, summarises, pushes to Telegram + Obsidian"></div>
+      <div class="qa-quote">"My Hermes agent automatically pulls in new voice recordings and transcripts from my Pocket AI recorder every 4 hours. No manual exporting, no digging through apps. Hermes catches random business ideas, design thoughts, client notes, and supplier reminders, processes them, and pushes a clean summary straight to my Telegram + saving to vault in Obsidian. Wild ideas from 3 AM or inspiration while driving actually end up somewhere useful."</div>
+      <span class="qa-answer-tag">My answer —</span>
+      <div class="qa-answer">
+        <p>This is the dream pattern. Stop everything and copy what Jerry just shipped.</p>
+        <p>Pocket AI recorder catches your voice notes all day. Every 4 hours, Hermes pulls the new ones.</p>
+        <p>It splits each note into the right bucket — idea, client, supplier, reminder. Then it pushes a clean Telegram digest to your phone. Then it saves a permanent copy to Obsidian.</p>
+        <p>Your 3am drive ideas end up in your second brain. Your client mention while making coffee ends up tagged to that client's note. Your supplier reminder ends up where you'll see it tomorrow.</p>
+        <p>This is what "AI as infrastructure, not a tab" actually looks like.</p>
+        <p>Once you have it, you cannot go back.</p>
+      </div>
+    </div>
+
+    <a href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener" class="section-cta">
+      <div class="head">Want to ask your <em>own</em> question in the room?</div>
+      <div class="sub">3,000+ members. Daily live rooms. One DM and someone helps.</div>
+      <span class="pill">Join the Socratic Society →</span>
+      <div class="micro">$59/month · 7-day refund · cancel anytime</div>
+    </a>
+  </section>
+
+  <div class="divider"><span class="rule"></span><span class="ornament">✦</span><span class="rule"></span></div>
+
+  <!-- ============ X — RECAP ============ -->
+  <section>
+    <div class="eyebrow">
+      <span class="num">X.</span>
+      <span class="line"></span>
+      <span class="label">The whole guide on one screen</span>
+    </div>
+
+    <h2>Recap.</h2>
+
+    <div class="recap-grid">
+      <div class="recap-tile">
+        <div class="icon">i.</div>
+        <h4>John's pattern</h4>
+        <p>3 states, multiple devices, one VPS dashboard</p>
+      </div>
+      <div class="recap-tile">
+        <div class="icon">ii.</div>
+        <h4>The 4 layers</h4>
+        <p>VPS · Tunnel · Access · Agent OS</p>
+      </div>
+      <div class="recap-tile">
+        <div class="icon">iii.</div>
+        <h4>Cost</h4>
+        <p>~$5/mo VPS + free Cloudflare</p>
+      </div>
+      <div class="recap-tile">
+        <div class="icon">iv.</div>
+        <h4>Setup time</h4>
+        <p>About 90 minutes start to finish</p>
+      </div>
+      <div class="recap-tile">
+        <div class="icon">v.</div>
+        <h4>Mobile-ready</h4>
+        <p>Phone, iPad, every desktop — same dashboard</p>
+      </div>
+      <div class="recap-tile">
+        <div class="icon">vi.</div>
+        <h4>Always on</h4>
+        <p>Codex Goal Mode runs while you sleep</p>
+      </div>
+      <div class="recap-tile">
+        <div class="icon">vii.</div>
+        <h4>Secure</h4>
+        <p>Cloudflare Access checks every login</p>
+      </div>
+      <div class="recap-tile">
+        <div class="icon">viii.</div>
+        <h4>One agent per role</h4>
+        <p>Separate Hermes for VA, TC, content, SEO</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAGLINE BAND ============ -->
+  <div class="tagline-band">
+    <div class="promise">— the dashboard that follows you —</div>
+    <p>Hermes is the messenger god. The Hermes Stack is your messenger. <em>One</em> dashboard. Every device. Any state.</p>
+  </div>
+
+  <!-- ============ XI — FINAL CTA ============ -->
+  <section>
+    <div class="aos-cta">
+      <img src="/images/hermes-agent-os/openclaw-agent-os.png" class="triangle" alt="Agent OS — Claude, OpenClaw, Hermes wired together">
+
+      <h2>Build the <em>Hermes Stack</em> with me, this week.</h2>
+
+      <p class="lead">
+        Members of the AI Profit Boardroom get the full Agent OS source plus the Hermes Stack VPS guide. We run live rooms every day where I walk new members through the install — including the Cloudflare Tunnel and Access steps that John used.
+      </p>
+
+      <ul>
+        <li>The full <b>Agent OS source code</b> — same dashboard John, Jerry, and 3,000 others run</li>
+        <li>The <b>Hermes Stack VPS guide</b> — Hostinger, Cloudflare, all 8 steps</li>
+        <li><b>Daily live setup rooms</b> — bring your laptop, leave with a working dashboard</li>
+        <li>The full <b>prompt library</b> — every Hermes / Claude / Codex prompt I run</li>
+        <li>A <b>30-day roadmap</b> — go from "just joined" to "running my whole business through it"</li>
+        <li>A <b>member map</b> — find Boardroom members in your city</li>
+        <li><b>The Socratic Society</b> — ask anything, the room helps</li>
+        <li><b>Lifetime updates</b> — every new framework, you get it the same week</li>
+      </ul>
+
+      <div class="center-btn">
+        <a class="btn" href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener">Join the AI Profit Boardroom →</a>
+        <div class="caveat-note">$59 / month · 7-day refund · cancel anytime ✨</div>
+      </div>
+    </div>
+
+    <div class="testimonials-callout">
+      <div class="t-tag">The proof, in their own words</div>
+      <p>158 pages of members who already built this. Their wins, their numbers, their setups — documented and dated.</p>
+      <a href="https://docs.google.com/document/d/1dpdMktIMiJTsOCf_Jb4kFLQfr3uMXX0RHUR9Bub0dU8/edit?tab=t.0" target="_blank" rel="noopener" class="testimonials-btn">Read the 158-page testimonials doc →</a>
+    </div>
+  </section>
+
+  <!-- ============ FINAL CLOSE ============ -->
+  <div class="final-close">
+    <div class="signoff">— ready when you are —</div>
+    <h2>Pick your <em>VPS</em>. Open your dashboard. Anywhere.</h2>
+    <p style="max-width: 620px; margin: 0 auto 24px;">
+      John Mesa runs his whole business across three states from one VPS. Jerry Polson catches every 3 AM idea via Hermes. Sachi Lord is about to ship 20 thumbnail variations in 4 minutes. The Hermes Stack isn't theory. The room is already running it. You can be next.
+    </p>
+    <p style="max-width: 620px; margin: 0 auto 30px;">
+      <strong style="color: var(--cream);">I'll see you in the next one.</strong>
+    </p>
+    <a class="btn" href="https://www.skool.com/ai-profit-lab-7462/about" target="_blank" rel="noopener"
+       style="display: inline-block; background: linear-gradient(180deg, var(--gold), var(--gold-deep)); color: var(--bg-deep); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 1.02rem; letter-spacing: 0.04em; padding: 18px 42px; border-radius: 999px; box-shadow: 0 14px 36px rgba(212, 165, 116, 0.42);">
+      Join the AI Profit Boardroom →
+    </a>
+    <div style="margin-top: 18px; font-family: 'Manrope', sans-serif; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cream-mute);">
+      3,000+ members · 7-day refund · daily live rooms
+    </div>
+  </div>
+
+  <div class="footer">
+    Built in Bangkok. Used daily by members across 38 countries.<br>
+    — Julian Goldie · <a href="https://aiprofitboardroom.com" target="_blank" rel="noopener">aiprofitboardroom.com</a>
+  </div>
+
+</main>
+
+<script>
+  // Reading progress
+  (function() {
+    const bar = document.getElementById('progressBar');
+    function update() {
+      const h = document.documentElement;
+      const scrolled = h.scrollTop;
+      const total = h.scrollHeight - h.clientHeight;
+      bar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+</script>
+
+</body>
+</html>

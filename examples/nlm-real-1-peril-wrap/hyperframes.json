@@ -1,0 +1,8 @@
+{
+  "name": "nlm-real-1-peril-wrap",
+  "composition": "index.html",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 70
+}

@@ -1,0 +1,19 @@
+{
+  "prompt": "Showcase #3 — Vlog-style weekly update template. Full-bleed avatar talking head, animated lower thirds for each topic, callout arrows pointing to on-screen elements, brand bars top + bottom, channel intro + outro. Reusable — Julian swaps text + avatar weekly.",
+  "createdAt": 1779800000002,
+  "source": "agent-os/video/showcase",
+  "showcase": true,
+  "showcaseId": 3,
+  "title": "Vlog-style daily update · 90s template",
+  "description": "Avatar-centric talking-head format. Swap the script + avatar each week and re-render.",
+  "estimatedDuration": 90,
+  "scenes": [
+    { "name": "Channel intro animation", "duration": 5 },
+    { "name": "Avatar reveal with brand bars", "duration": 5 },
+    { "name": "Topic 1 callout — pink", "duration": 18 },
+    { "name": "Topic 2 callout — emerald", "duration": 18 },
+    { "name": "Topic 3 callout — blue", "duration": 18 },
+    { "name": "Like & subscribe burst", "duration": 16 },
+    { "name": "Channel outro", "duration": 10 }
+  ]
+}

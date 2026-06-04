@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Agent OS · Real NotebookLM Wrap — Power and Peril</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<style>
+  :root {
+    --bg-deep: #15101a; --cream: #f3ebda; --cream-dim: #a59783;
+    --gold: #d4a574; --pink: #f472b6; --emerald: #5ab896;
+    --blue: #60a5fa; --plum: #c4607e; --rust: #c97c5e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; overflow: hidden; font-family: 'Inter', -apple-system, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  #stage {
+    position: relative;
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: #0a070d;
+  }
+
+  /* NLM source — fills safe area between brand bars */
+  .source-stage {
+    position: absolute;
+    top: 90px; left: 0; right: 0; bottom: 110px;
+    z-index: 1;
+    background: #0a070d;
+    overflow: hidden;
+  }
+  .source-stage video {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    background: #15101a;
+  }
+
+  /* INTRO CARD */
+  .intro-card {
+    position: absolute; inset: 0; z-index: 50;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(212,165,116,0.15), transparent),
+                linear-gradient(135deg, #15101a, #0a070d);
+    display: grid; place-items: center;
+  }
+  .intro-card .stack { text-align: center; padding: 0 80px; }
+  .intro-card .nlm-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    background: rgba(96,165,250,0.12);
+    border: 1px solid var(--blue);
+    border-radius: 999px;
+    margin-bottom: 36px;
+    opacity: 0;
+  }
+  .intro-card .nlm-pill .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--blue);
+    margin-right: 12px;
+    box-shadow: 0 0 12px var(--blue);
+  }
+  .intro-card .nlm-pill .label {
+    font-size: 20px;
+    color: var(--blue);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .intro-card h1 {
+    font-size: 130px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    background: linear-gradient(180deg, #f3ebda, #d4a574);
+    -webkit-background-clip: text; color: transparent;
+    margin-bottom: 30px;
+  }
+  .intro-card .subtitle {
+    font-size: 44px;
+    color: var(--cream-dim);
+    letter-spacing: -0.01em;
+    opacity: 0;
+    margin-bottom: 36px;
+  }
+  .intro-card .meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: rgba(243,235,218,0.06);
+    border-radius: 8px;
+    opacity: 0;
+  }
+  .intro-card .meta .item {
+    font-size: 20px;
+    color: var(--cream-dim);
+    letter-spacing: 0.05em;
+  }
+  .intro-card .meta .item strong {
+    color: var(--cream);
+    font-weight: 700;
+  }
+  .intro-card .meta .sep {
+    color: var(--gold);
+  }
+
+  /* TOP BRAND BAR */
+  .brand-bar-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 90px;
+    z-index: 20;
+    background: linear-gradient(180deg, rgba(21,16,26,0.98), rgba(21,16,26,0.92));
+    border-bottom: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    padding: 0 50px;
+    transform: translateY(-100%);
+  }
+  .brand-bar-top .logo {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+  }
+  .brand-bar-top .logo em {
+    font-style: normal;
+    color: var(--gold);
+  }
+  .brand-bar-top .spacer { flex: 1; }
+  .brand-bar-top .src-tag {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 20px;
+    color: var(--cream-dim);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .brand-bar-top .src-tag strong { color: var(--blue); font-weight: 700; }
+  .brand-bar-top .live-pill {
+    display: flex; align-items: center;
+    margin-left: 24px;
+    padding: 8px 18px;
+    background: rgba(96,165,250,0.14);
+    border: 1px solid var(--blue);
+    border-radius: 999px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--blue);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .brand-bar-top .live-pill .d {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    margin-right: 10px;
+    box-shadow: 0 0 10px var(--blue);
+  }
+
+  /* BOTTOM BRAND BAR */
+  .brand-bar-bot {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 110px;
+    z-index: 20;
+    background: linear-gradient(0deg, rgba(21,16,26,0.98), rgba(21,16,26,0.85));
+    border-top: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    padding: 0 50px;
+    transform: translateY(100%);
+  }
+  .brand-bar-bot .url {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+  }
+  .brand-bar-bot .url em {
+    font-style: normal;
+    color: var(--gold);
+  }
+  .brand-bar-bot .spacer { flex: 1; }
+  .brand-bar-bot .channel {
+    font-size: 22px;
+    color: var(--cream-dim);
+  }
+  .brand-bar-bot .channel strong {
+    color: var(--cream);
+    font-weight: 700;
+  }
+
+  /* CHAPTER CALLOUTS — five NLM chapters surface on top of source */
+  .chapter-cap {
+    position: absolute;
+    top: 130px; left: 50px;
+    z-index: 30;
+    padding: 18px 28px;
+    background: rgba(21,16,26,0.94);
+    border-left: 5px solid var(--pink);
+    border-radius: 6px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  .chapter-cap .num {
+    font-size: 14px;
+    color: var(--pink);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .chapter-cap .title {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--cream);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .cap-2 { border-left-color: var(--emerald); }
+  .cap-2 .num { color: var(--emerald); }
+  .cap-3 { border-left-color: var(--blue); }
+  .cap-3 .num { color: var(--blue); }
+  .cap-4 { border-left-color: var(--gold); }
+  .cap-4 .num { color: var(--gold); }
+  .cap-5 { border-left-color: var(--plum); }
+  .cap-5 .num { color: var(--plum); }
+
+  /* NLM SOURCE BADGE — small pill bottom-right inside source area */
+  .nlm-badge {
+    position: absolute;
+    bottom: 140px; right: 50px;
+    z-index: 25;
+    display: flex; align-items: center;
+    padding: 10px 18px;
+    background: rgba(21,16,26,0.92);
+    border: 1px solid var(--blue);
+    border-radius: 999px;
+    opacity: 0;
+  }
+  .nlm-badge .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    margin-right: 10px;
+    box-shadow: 0 0 10px var(--blue);
+  }
+  .nlm-badge .label {
+    font-size: 16px;
+    color: var(--blue);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  /* OUTRO */
+  .outro-card {
+    position: absolute; inset: 0; z-index: 50;
+    background: linear-gradient(135deg, #15101a, #0a070d);
+    display: grid; place-items: center;
+    opacity: 0;
+  }
+  .outro-card .stack { text-align: center; padding: 0 80px; }
+  .outro-card .eyebrow {
+    font-size: 26px;
+    color: var(--blue);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-weight: 700;
+  }
+  .outro-card h2 {
+    font-size: 120px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    background: linear-gradient(180deg, #f3ebda, #d4a574);
+    -webkit-background-clip: text; color: transparent;
+    margin-bottom: 32px;
+  }
+  .outro-card .sub {
+    font-size: 32px;
+    color: var(--cream-dim);
+    margin-bottom: 50px;
+  }
+  .outro-card .ctas {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+  }
+  .outro-card .cta {
+    padding: 24px 48px;
+    border-radius: 999px;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .outro-card .cta-1 {
+    background: var(--blue);
+    color: white;
+    box-shadow: 0 0 40px rgba(96,165,250,0.4);
+  }
+  .outro-card .cta-2 {
+    background: transparent;
+    color: var(--cream);
+    border: 2px solid var(--gold);
+  }
+  .outro-card .url {
+    margin-top: 40px;
+    font-size: 22px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+  }
+
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, rgba(96,165,250,0.5), transparent),
+      radial-gradient(2px 2px at 80% 70%, rgba(212,165,116,0.4), transparent),
+      radial-gradient(1px 1px at 50% 50%, rgba(243,235,218,0.4), transparent),
+      radial-gradient(1px 1px at 30% 80%, rgba(96,165,250,0.3), transparent);
+    background-size: 800px 800px, 600px 600px, 400px 400px, 500px 500px;
+  }
+</style>
+</head>
+<body>
+<div id="stage" data-composition-id="agent-os-nlm-peril-wrap" data-duration="70" data-width="1920" data-height="1080">
+
+  <!-- REAL NLM SOURCE VIDEO — 5s to 65s -->
+  <div class="source-stage" id="source-stage">
+    <video id="src-video" src="assets/peril-60s.mp4"
+           data-start="5" data-duration="60" data-track-index="0"
+           muted playsinline preload="auto"></video>
+  </div>
+
+  <!-- INTRO CARD — 0s to 5s -->
+  <div class="intro-card" id="intro-card">
+    <div class="stars"></div>
+    <div class="stack">
+      <div class="nlm-pill" id="intro-pill">
+        <div class="dot"></div>
+        <div class="label">NotebookLM · Video Overview</div>
+      </div>
+      <h1 id="intro-h1">OpenClaw</h1>
+      <div class="subtitle" id="intro-sub">Power and Peril</div>
+      <div class="meta" id="intro-meta">
+        <div class="item"><strong>5 chapters</strong></div>
+        <div class="sep">·</div>
+        <div class="item"><strong>7m 19s</strong> source</div>
+        <div class="sep">·</div>
+        <div class="item">From the <strong>OpenClaw</strong> notebook</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP BRAND BAR -->
+  <div class="brand-bar-top" id="bar-top">
+    <div class="logo">AGENT <em>OS</em></div>
+    <div class="spacer"></div>
+    <div class="src-tag">Source · <strong>NotebookLM</strong></div>
+    <div class="live-pill"><span class="d"></span>Real NLM Asset</div>
+  </div>
+
+  <!-- BOTTOM BRAND BAR -->
+  <div class="brand-bar-bot" id="bar-bot">
+    <div class="url">agentos<em>.guide</em></div>
+    <div class="spacer"></div>
+    <div class="channel"><strong>Julian Goldie</strong> · AI Profit Boardroom</div>
+  </div>
+
+  <!-- NLM source badge inside the video area -->
+  <div class="nlm-badge" id="nlm-badge">
+    <div class="dot"></div>
+    <div class="label">Generated by NotebookLM</div>
+  </div>
+
+  <!-- CHAPTER CALLOUTS (5 real chapters from this NLM video) -->
+  <div class="chapter-cap cap-1" id="cap-1">
+    <div class="num">Chapter 01</div>
+    <div class="title">Meet OpenClaw</div>
+  </div>
+  <div class="chapter-cap cap-2" id="cap-2">
+    <div class="num">Chapter 02</div>
+    <div class="title">A Dangerous Tool</div>
+  </div>
+  <div class="chapter-cap cap-3" id="cap-3">
+    <div class="num">Chapter 03</div>
+    <div class="title">How The Claw Attacks</div>
+  </div>
+  <div class="chapter-cap cap-4" id="cap-4">
+    <div class="num">Chapter 04</div>
+    <div class="title">Putting a Leash On It</div>
+  </div>
+  <div class="chapter-cap cap-5" id="cap-5">
+    <div class="num">Chapter 05</div>
+    <div class="title">What This Means For You</div>
+  </div>
+
+  <!-- OUTRO -->
+  <div class="outro-card" id="outro-card">
+    <div class="stars"></div>
+    <div class="stack">
+      <div class="eyebrow">Made with Agent OS</div>
+      <h2>NotebookLM → HyperFrames</h2>
+      <div class="sub">Edit real NLM artifacts inside the dashboard</div>
+      <div class="ctas">
+        <div class="cta cta-1">Watch the full deep dive</div>
+        <div class="cta cta-2">Run Agent OS</div>
+      </div>
+      <div class="url">agentos.guide</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  window.__timelines = window.__timelines || {};
+
+  // Initial states — kept out of CSS to avoid the .from(0→0) trap.
+  gsap.set("#bar-top", { y: -100 });
+  gsap.set("#bar-bot", { y: 100 });
+  gsap.set(".chapter-cap", { opacity: 0, x: -30 });
+  gsap.set("#nlm-badge", { opacity: 0 });
+  gsap.set("#outro-card", { opacity: 0 });
+  gsap.set("#intro-h1", { opacity: 0, scale: 0.85, y: 40 });
+
+  const tl = gsap.timeline({ paused: true });
+
+  // 0-5s: INTRO
+  tl.to("#intro-pill", { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.3)
+    .to("#intro-h1", { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: "back.out(1.4)" }, 0.6)
+    .to("#intro-sub", { opacity: 1, duration: 0.5, ease: "power2.out" }, 1.5)
+    .to("#intro-meta", { opacity: 1, duration: 0.5, ease: "power2.out" }, 2.0)
+    .to("#intro-card", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 4.5);
+
+  // 5s: Brand bars + NLM badge slide in
+  tl.to("#bar-top", { y: 0, duration: 0.6, ease: "power3.out" }, 5)
+    .to("#bar-bot", { y: 0, duration: 0.6, ease: "power3.out" }, 5.1)
+    .to("#nlm-badge", { opacity: 1, duration: 0.4 }, 5.5);
+
+  // Chapter callouts — each visible ~10s, rotating through the 60s clip
+  // cap-1: 7-17s
+  tl.to("#cap-1", { opacity: 1, x: 0, duration: 0.4, ease: "back.out(1.4)" }, 7)
+    .to("#cap-1", { opacity: 0, x: -30, duration: 0.3, ease: "power2.in" }, 17);
+  // cap-2: 18-28s
+  tl.to("#cap-2", { opacity: 1, x: 0, duration: 0.4, ease: "back.out(1.4)" }, 18)
+    .to("#cap-2", { opacity: 0, x: -30, duration: 0.3, ease: "power2.in" }, 28);
+  // cap-3: 29-39s
+  tl.to("#cap-3", { opacity: 1, x: 0, duration: 0.4, ease: "back.out(1.4)" }, 29)
+    .to("#cap-3", { opacity: 0, x: -30, duration: 0.3, ease: "power2.in" }, 39);
+  // cap-4: 40-50s
+  tl.to("#cap-4", { opacity: 1, x: 0, duration: 0.4, ease: "back.out(1.4)" }, 40)
+    .to("#cap-4", { opacity: 0, x: -30, duration: 0.3, ease: "power2.in" }, 50);
+  // cap-5: 51-63s
+  tl.to("#cap-5", { opacity: 1, x: 0, duration: 0.4, ease: "back.out(1.4)" }, 51)
+    .to("#cap-5", { opacity: 0, x: -30, duration: 0.3, ease: "power2.in" }, 63);
+
+  // 65s: Brand bars slide out, outro fades in
+  tl.to("#bar-top", { y: -100, duration: 0.5, ease: "power3.in" }, 64.5)
+    .to("#bar-bot", { y: 100, duration: 0.5, ease: "power3.in" }, 64.5)
+    .to("#nlm-badge", { opacity: 0, duration: 0.4 }, 64.5)
+    .to("#outro-card", { opacity: 1, duration: 0.6, ease: "power2.out" }, 65);
+
+  window.__timelines["agent-os-nlm-peril-wrap"] = tl;
+</script>
+</body>
+</html>
